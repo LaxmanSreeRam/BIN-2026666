@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap');
+
+:root {
+  --verde-red: #D02020;
+  --verde-blue: #1040C0;
+  --verde-yellow: #F0C020;
+  --verde-black: #121212;
+  --verde-canvas: #F0F0F0;
+}
+
+body {
+  background-color: var(--verde-canvas) !important;
+  color: var(--verde-black) !important;
+  font-family: 'Outfit', sans-serif !important;
+}
+
+/* Offset Hard Shadows & Thick Borders */
+.geo-card {
+  background-color: #ffffff;
+  border: 4px solid var(--verde-black) !important;
+  box-shadow: 6px 6px 0px 0px var(--verde-black) !important;
+  border-radius: 0px !important;
+}
+
+.geo-btn-red {
+  background-color: var(--verde-red) !important;
+  color: #ffffff !important;
+  border: 4px solid var(--verde-black) !important;
+  box-shadow: 4px 4px 0px 0px var(--verde-black) !important;
+  border-radius: 0px !important;
+  font-weight: 900;
+  text-transform: uppercase;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.geo-btn-red:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
+.geo-btn-blue {
+  background-color: var(--verde-blue) !important;
+  color: #ffffff !important;
+  border: 4px solid var(--verde-black) !important;
+  box-shadow: 4px 4px 0px 0px var(--verde-black) !important;
+  border-radius: 0px !important;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.geo-btn-blue:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
+.geo-btn-yellow {
+  background-color: var(--verde-yellow) !important;
+  color: var(--verde-black) !important;
+  border: 4px solid var(--verde-black) !important;
+  box-shadow: 4px 4px 0px 0px var(--verde-black) !important;
+  border-radius: 0px !important;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.geo-btn-yellow:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "ECO POINTS PORTAL",
+  "description": "Sustainability tracking dashboard with student login, eco activity logs, eco calculator, and community challenges.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

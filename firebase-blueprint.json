@@ -1,0 +1,198 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Student profile with eco points, house affiliation, and eco number (grNo)",
+      "type": "object",
+      "properties": {
+        "grNo": { "type": "string", "maxLength": 32 },
+        "username": { "type": "string", "maxLength": 40 },
+        "name": { "type": "string", "maxLength": 100 },
+        "house": { "type": "string", "maxLength": 50 },
+        "role": { "type": "string", "maxLength": 50 },
+        "points": { "type": "number" },
+        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "email": { "type": "string", "maxLength": 150 },
+        "lastActive": { "type": "string", "maxLength": 50 },
+        "followers": { "type": "array", "items": { "type": "string" } },
+        "following": { "type": "array", "items": { "type": "string" } },
+        "followRequests": { "type": "array", "items": { "type": "string" } },
+        "followPrivacy": { "type": "string", "enum": ["direct", "request", "private"] }
+      },
+      "required": ["grNo", "name"]
+    },
+    "DirectMessage": {
+      "title": "DirectMessage",
+      "description": "Instagram-style Direct Message between students",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "conversationId": { "type": "string", "maxLength": 100 },
+        "senderId": { "type": "string", "maxLength": 50 },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "senderUsername": { "type": "string", "maxLength": 50 },
+        "senderAvatar": { "type": "string", "maxLength": 500 },
+        "receiverId": { "type": "string", "maxLength": 50 },
+        "receiverName": { "type": "string", "maxLength": 100 },
+        "receiverUsername": { "type": "string", "maxLength": 50 },
+        "receiverAvatar": { "type": "string", "maxLength": 500 },
+        "text": { "type": "string", "maxLength": 5000 },
+        "timestamp": { "type": "string", "maxLength": 50 },
+        "read": { "type": "boolean" },
+        "reaction": { "type": "string", "maxLength": 20 }
+      },
+      "required": ["id", "conversationId", "senderId", "receiverId", "text", "timestamp"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Logged eco sustainability activity (recycling, energy saving, etc.)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "grNo": { "type": "string", "maxLength": 32 },
+        "studentName": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "subCategory": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "pointsEarned": { "type": "number" },
+        "co2SavedKg": { "type": "number" },
+        "waterSavedLiters": { "type": "number" },
+        "wasteDivertedKg": { "type": "number" },
+        "energySavedKwh": { "type": "number" },
+        "timestamp": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "maxLength": 20 },
+        "approvedBy": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["id", "grNo", "title", "pointsEarned", "status"]
+    },
+    "FeedPost": {
+      "title": "FeedPost",
+      "description": "Community eco-activity feed post",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "authorName": { "type": "string", "maxLength": 100 },
+        "authorGrNo": { "type": "string", "maxLength": 32 },
+        "authorAvatar": { "type": "string", "maxLength": 500 },
+        "actionTitle": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "maxLength": 50 },
+        "pointsEarned": { "type": "number" },
+        "timestamp": { "type": "string", "maxLength": 50 },
+        "likes": { "type": "number" },
+        "cheers": { "type": "number" }
+      },
+      "required": ["id", "authorName", "actionTitle", "pointsEarned"]
+    },
+    "IssueReport": {
+      "title": "IssueReport",
+      "description": "Direct user support inquiry and issue report ticket",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 4000 },
+        "grNo": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "maxLength": 50 },
+        "timestamp": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "name", "email", "description"]
+    },
+    "PortalConfig": {
+      "title": "PortalConfig",
+      "description": "System-wide portal settings including official logo lock state",
+      "type": "object",
+      "properties": {
+        "isLocked": { "type": "boolean" },
+        "logoUrl": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "TeamMemberBio": {
+      "title": "TeamMemberBio",
+      "description": "Team member bio, background, and perspective on why VerdeTech is special",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "maxLength": 100 },
+        "aboutMe": { "type": "string", "maxLength": 2000 },
+        "bio": { "type": "string", "maxLength": 3000 },
+        "whyVerdeTechSpecial": { "type": "string", "maxLength": 2000 },
+        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "isLead": { "type": "boolean" },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "name", "role", "bio"]
+    },
+    "GiftCard": {
+      "title": "GiftCard",
+      "description": "Gift card or Raspberry Pi smart eco bin redeemable reward code",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "code": { "type": "string", "maxLength": 50 },
+        "points": { "type": "number" },
+        "redeemed": { "type": "boolean" },
+        "redeemedBy": { "type": "string", "maxLength": 50 },
+        "redeemedByName": { "type": "string", "maxLength": 100 },
+        "redeemedAt": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["code", "points"]
+    },
+    "PendingVerification": {
+      "title": "PendingVerification",
+      "description": "Temporary email verification records with expiration for portal registration",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 150 },
+        "code": { "type": "string", "maxLength": 10 },
+        "expiresAt": { "type": "number" },
+        "studentName": { "type": "string", "maxLength": 100 },
+        "ecoNumber": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "number" },
+        "expired": { "type": "boolean" },
+        "verified": { "type": "boolean" },
+        "verifiedAt": { "type": "number" }
+      },
+      "required": ["email", "code", "expiresAt"]
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Collection of student accounts and profiles"
+    },
+    "/logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Submitted eco activity entries"
+    },
+    "/feedPosts/{postId}": {
+      "schema": "FeedPost",
+      "description": "Public community eco feed entries"
+    },
+    "/issues/{issueId}": {
+      "schema": "IssueReport",
+      "description": "User reported support issues"
+    },
+    "/portalConfig/{configId}": {
+      "schema": "PortalConfig",
+      "description": "Portal wide settings and logo lock status"
+    },
+    "/teamBios/{bioId}": {
+      "schema": "TeamMemberBio",
+      "description": "Team member profiles and bio information"
+    },
+    "/giftCards/{cardId}": {
+      "schema": "GiftCard",
+      "description": "Gift cards and Raspberry Pi smart eco bin codes"
+    },
+    "/pending_verifications/{email}": {
+      "schema": "PendingVerification",
+      "description": "Pending email verification entries with expiration"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "binId": "BIN-001",
+  "location": "Main Campus Entrance",
+  "defaultPoints": 50,
+  "giftCodes": [
+    {
+      "redeemCode": "ECO50-PI1",
+      "pointsGiven": 50
+    },
+    {
+      "redeemCode": "ECO100-PI2",
+      "pointsGiven": 100
+    },
+    {
+      "redeemCode": "GREEN-BIN-99",
+      "pointsGiven": 75
+    },
+    {
+      "redeemCode": "RECYCLE-2026",
+      "pointsGiven": 50
+    },
+    {
+      "redeemCode": "VERDETECH-BONUS",
+      "pointsGiven": 150
+    },
+    {
+      "redeemCode": "RANDOM-ECO-999",
+      "pointsGiven": 200
+    },
+    {
+      "redeemCode": "PLASTIC-FREE-25",
+      "pointsGiven": 25
+    },
+    {
+      "redeemCode": "COMPOST-WIN-500",
+      "pointsGiven": 500
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Students collection (Profiles, eco points, and houses)
+    match /students/{studentId} {
+      allow read: if true;
+      allow create, update: if isValidId(studentId);
+      allow delete: if false;
+    }
+
+    // Instagram-style Direct Messages
+    match /direct_messages/{messageId} {
+      allow read: if true;
+      allow create, update: if isValidId(messageId);
+      allow delete: if isValidId(messageId);
+    }
+
+    // Conversations summary / metadata
+    match /conversations/{convId} {
+      allow read, write: if isValidId(convId);
+    }
+
+    // Activity logs collection
+    match /logs/{logId} {
+      allow read: if true;
+      allow create, update: if isValidId(logId);
+      allow delete: if isValidId(logId);
+    }
+
+    // Public community eco feed posts
+    match /feedPosts/{postId} {
+      allow read: if true;
+      allow create, update: if isValidId(postId);
+      allow delete: if isValidId(postId);
+    }
+
+    // Support issue reports
+    match /issues/{issueId} {
+      allow read, create: if isValidId(issueId);
+      allow update, delete: if false;
+    }
+
+    // Portal configuration (e.g. logo lock status, settings)
+    match /portalConfig/{configId} {
+      allow read, write: if isValidId(configId);
+    }
+
+    // Team member bios
+    match /teamBios/{bioId} {
+      allow read, write: if isValidId(bioId);
+    }
+
+    // Gift cards & Raspberry Pi redeem codes
+    match /giftCards/{cardId} {
+      allow read: if true;
+      allow create, update: if isValidId(cardId);
+      allow delete: if false;
+    }
+
+    // Pending email verification codes
+    match /pending_verifications/{email} {
+      allow read, write: if isValidId(email);
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
