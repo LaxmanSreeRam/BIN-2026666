@@ -1024,6 +1024,7 @@ export default function App() {
         isOpen={isTrueAdminOpen}
         onClose={() => setIsTrueAdminOpen(false)}
         logs={logs}
+        students={students}
       />
 
       {/* User Profile Modal */}

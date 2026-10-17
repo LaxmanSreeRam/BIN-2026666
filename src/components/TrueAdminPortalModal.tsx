@@ -13,7 +13,8 @@ import {
   RefreshCw,
   FileText
 } from 'lucide-react';
-import { ActivityLog } from '../types';
+import { ActivityLog, Student } from '../types';
+import { saveStudentToFirestore } from '../lib/firebaseSync';
 
 interface TrueAdminPortalModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
   isOpen,
   onClose,
   logs,
+  students,
 }) => {
   const [step, setStep] = useState<'auth' | 'verify' | 'dashboard'>('auth');
   const [staffId, setStaffId] = useState<string>('');
@@ -33,7 +35,7 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'usage' | 'emptying' | 'sensors'>('usage');
+  const [activeTab, setActiveTab] = useState<'usage' | 'emptying' | 'sensors' | 'maintenance'>('usage');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const AUTHORIZED_ADMINS = [
@@ -87,6 +89,11 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
           ecoNumber: trimmedStaff,
         }),
       });
+
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.statusText}`);
+      }
+      
       const data = await res.json();
       if (data.success) {
         setSuccessMsg(`Verification code sent to ${trimmedEmail}. Please check your inbox.`);
@@ -95,7 +102,8 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
         setErrorMsg(data.error || 'Failed to send verification code.');
       }
     } catch (err) {
-      setErrorMsg('Network error sending verification code.');
+      console.error('Request failed:', err);
+      setErrorMsg(err instanceof Error ? err.message : 'Network or server error sending verification code.');
     } finally {
       setLoading(false);
     }
@@ -307,6 +315,16 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
                     <HardDrive className="w-4 h-4 me-1.5 inline" />
                     <span>System & IoT Sensors</span>
                   </button>
+
+                  <button
+                    onClick={() => setActiveTab('maintenance')}
+                    className={`btn rounded-0 fw-black text-uppercase border border-3 border-dark px-3 py-2 shadow-[2px_2px_0px_0px_black] ${
+                      activeTab === 'maintenance' ? 'btn-danger text-white' : 'btn-light text-dark'
+                    }`}
+                  >
+                    <AlertTriangle className="w-4 h-4 me-1.5 inline" />
+                    <span>System Maintenance</span>
+                  </button>
                 </div>
 
                 {/* Tab 1: Smart Bin Usage */}
@@ -433,6 +451,39 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
                         <p className="small text-success fw-bold m-0 mt-2">Staff Session Verified</p>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Tab 4: Maintenance */}
+                {activeTab === 'maintenance' && (
+                  <div className="card bg-light text-dark rounded-0 border border-3 border-dark p-5 text-center">
+                    <h5 className="fw-black text-uppercase text-danger mb-3">System Maintenance: Reset All Points</h5>
+                    <p className="text-muted fw-bold mb-4">
+                      WARNING: This action will permanently reset all user points to zero across the entire platform.
+                      <br />
+                      This action cannot be undone.
+                    </p>
+                    <button
+                      onClick={async () => {
+                        if (confirm('Are you absolutely sure you want to reset all user points to zero? This action is irreversible.')) {
+                          setLoading(true);
+                          try {
+                            for (const student of students) {
+                              await saveStudentToFirestore({ ...student, points: 0, weeklyPoints: 0 });
+                            }
+                            alert('All user points have been reset to zero.');
+                          } catch (err) {
+                            alert('Failed to reset points.');
+                          } finally {
+                            setLoading(false);
+                          }
+                        }
+                      }}
+                      disabled={loading}
+                      className="btn btn-danger text-white fw-black text-uppercase rounded-0 border border-3 border-dark py-3 px-5 shadow-[4px_4px_0px_0px_black]"
+                    >
+                      {loading ? 'Processing...' : 'Reset All Points'}
+                    </button>
                   </div>
                 )}
 
