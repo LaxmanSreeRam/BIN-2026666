@@ -242,7 +242,7 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
 
                 <h3 className="fw-black text-uppercase text-dark mb-2">Enter Verification Code</h3>
                 <p className="text-muted fw-medium small mb-3">
-                  We have sent a 6-digit verification code to <strong className="text-dark">{email}</strong>.
+                  We have sent a 6-digit verification code to your registered email address.
                 </p>
 
                 {successMsg && (

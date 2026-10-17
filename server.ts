@@ -735,66 +735,71 @@ async function startServer() {
   });
 
   app.post('/api/send-verification', async (req, res) => {
-    const { email, studentName } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email is required' });
+    try {
+      const { email, studentName } = req.body;
+      if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    const cleanEmail = String(email).trim().toLowerCase();
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes TTL
+      const cleanEmail = String(email).trim().toLowerCase();
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes TTL
 
-    verificationCodes.set(cleanEmail, {
-      code,
-      expiresAt,
-      studentName: studentName || 'Student',
-    });
+      verificationCodes.set(cleanEmail, {
+        code,
+        expiresAt,
+        studentName: studentName || 'Student',
+      });
 
-    if (db) {
-      try {
-        await setDoc(doc(db, 'pending_verifications', cleanEmail), {
-          email: cleanEmail,
-          code,
-          expiresAt,
-          studentName: studentName || 'Student',
-          updatedAt: Date.now(),
-        });
-      } catch (dbErr) {
-        console.warn('[FIRESTORE VERIFY CACHE NOTICE]', dbErr);
+      if (db) {
+        try {
+          await setDoc(doc(db, 'pending_verifications', cleanEmail), {
+            email: cleanEmail,
+            code,
+            expiresAt,
+            studentName: studentName || 'Student',
+            updatedAt: Date.now(),
+          });
+        } catch (dbErr) {
+          console.warn('[FIRESTORE VERIFY CACHE NOTICE]', dbErr);
+        }
       }
-    }
 
-    const mailResult = await sendEmailSafely({
-      to: cleanEmail,
-      subject: `VerdeTech Portal: Your Verification Code is ${code}`,
-      text: `Hello ${studentName || 'Student'},\n\nYour 6-digit email verification code is: ${code}\n\nPlease enter this code in the portal to verify your email and pick your @username.\n\nVerde Tech Portal Administration`,
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; max-width: 500px; background-color: #ffffff; color: #1e293b;">
-          <h2 style="color: #059669; margin-top: 0; font-size: 22px;">🌿 Verde Tech Portal</h2>
-          <p style="color: #334155; font-size: 15px;">Hello <strong>${studentName || 'Student'}</strong>,</p>
-          <p style="color: #334155; font-size: 14px; line-height: 1.5;">Here is your verification code to complete your Verde Tech registration:</p>
-          
-          <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 18px; border-radius: 12px; text-align: center; margin: 20px 0;">
-            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #166534; font-weight: bold; margin-bottom: 6px;">Your 6-Digit Verification Code</div>
-            <div style="font-size: 36px; font-weight: 900; color: #059669; font-family: monospace; letter-spacing: 6px;">${code}</div>
+      const mailResult = await sendEmailSafely({
+        to: cleanEmail,
+        subject: `VerdeTech Portal: Your Verification Code is ${code}`,
+        text: `Hello ${studentName || 'Student'},\n\nYour 6-digit email verification code is: ${code}\n\nPlease enter this code in the portal to verify your email and pick your @username.\n\nVerde Tech Portal Administration`,
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; max-width: 500px; background-color: #ffffff; color: #1e293b;">
+            <h2 style="color: #059669; margin-top: 0; font-size: 22px;">🌿 Verde Tech Portal</h2>
+            <p style="color: #334155; font-size: 15px;">Hello <strong>${studentName || 'Student'}</strong>,</p>
+            <p style="color: #334155; font-size: 14px; line-height: 1.5;">Here is your verification code to complete your Verde Tech registration:</p>
+            
+            <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 18px; border-radius: 12px; text-align: center; margin: 20px 0;">
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #166534; font-weight: bold; margin-bottom: 6px;">Your 6-Digit Verification Code</div>
+              <div style="font-size: 36px; font-weight: 900; color: #059669; font-family: monospace; letter-spacing: 6px;">${code}</div>
+            </div>
+
+            <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
+              💡 <em>This code will expire in 15 minutes. Enter this code to verify your identity and set up your student username handle.</em>
+            </p>
           </div>
+        `,
+      }, 'verify');
 
-          <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
-            💡 <em>This code will expire in 15 minutes. Enter this code to verify your identity and set up your student username handle.</em>
-          </p>
-        </div>
-      `,
-    }, 'verify');
+      console.log(`[VERIFY DISPATCH] Email: ${cleanEmail}, Code: ${code}, Delivered: ${mailResult.delivered}, Sender: ${mailResult.sender}`);
+      if (!mailResult.delivered) {
+        console.error(`[VERIFY DISPATCH ERROR] Email: ${cleanEmail}, Error: ${mailResult.error}`);
+      }
 
-    console.log(`[VERIFY DISPATCH] Email: ${cleanEmail}, Code: ${code}, Delivered: ${mailResult.delivered}, Sender: ${mailResult.sender}`);
-    if (!mailResult.delivered) {
-      console.error(`[VERIFY DISPATCH ERROR] Email: ${cleanEmail}, Error: ${mailResult.error}`);
+      res.json({
+        success: true,
+        delivered: mailResult.delivered,
+        sender: mailResult.sender,
+        error: mailResult.delivered ? undefined : mailResult.error,
+      });
+    } catch (err: any) {
+      console.error('[VERIFY DISPATCH CRITICAL ERROR]', err);
+      res.status(500).json({ success: false, error: 'Internal server error while sending verification code.' });
     }
-
-    res.json({
-      success: true,
-      delivered: mailResult.delivered,
-      sender: mailResult.sender,
-      error: mailResult.delivered ? undefined : mailResult.error,
-    });
   });
 
   app.post('/api/verify-code', async (req, res) => {
