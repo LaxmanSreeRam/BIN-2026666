@@ -798,7 +798,7 @@ async function startServer() {
       });
     } catch (err: any) {
       console.error('[VERIFY DISPATCH CRITICAL ERROR]', err);
-      res.status(500).json({ success: false, error: 'Internal server error while sending verification code.' });
+      res.status(500).json({ success: false, error: err instanceof Error ? err.message : String(err) });
     }
   });
 
