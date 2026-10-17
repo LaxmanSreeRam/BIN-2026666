@@ -785,6 +785,9 @@ async function startServer() {
     }, 'verify');
 
     console.log(`[VERIFY DISPATCH] Email: ${cleanEmail}, Code: ${code}, Delivered: ${mailResult.delivered}, Sender: ${mailResult.sender}`);
+    if (!mailResult.delivered) {
+      console.error(`[VERIFY DISPATCH ERROR] Email: ${cleanEmail}, Error: ${mailResult.error}`);
+    }
 
     res.json({
       success: true,
