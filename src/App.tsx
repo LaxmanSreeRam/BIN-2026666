@@ -765,7 +765,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen text-dark" style={{ backgroundColor: '#F0F0F0' }}>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Animated Welcome Banner on Login or Registration */}
       {welcomeAnimation && (
         <WelcomeBanner
@@ -977,38 +977,34 @@ export default function App() {
       </footer>
 
       {/* Maintenance Control Center & True Admin Portal Banners */}
-      <div className="bg-light border-top border-bottom border-4 border-dark py-4 px-3 text-dark">
-        <div className="container">
-          <div className="row align-items-center justify-content-between gy-3">
-            <div className="col-12 col-lg-8 d-flex align-items-center gap-2">
-              <span className="badge bg-danger rounded-0 text-white fw-bold">ADMIN</span>
-              <span className="small fw-bold">🔐 Smart Bin Maintenance & Hardware Control (Check fill level, bin condition, door status)</span>
+      <div className="bg-white border-t border-b border-slate-200 py-8 px-6 text-slate-900">
+        <div className="container max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold uppercase rounded-full">ADMIN</span>
+              <span className="text-sm font-semibold text-slate-700">🔐 Smart Bin Maintenance & Hardware Control</span>
             </div>
-            <div className="col-12 col-lg-4 text-lg-end">
-              <button
-                onClick={() => setIsAdminModalOpen(true)}
-                className="btn btn-warning text-dark fw-black btn-sm border border-2 border-dark rounded-0 shadow-[2px_2px_0px_0px_black]"
-              >
-                <Shield className="w-4 h-4 me-1" />
-                <span>Open Maintenance Control Center</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setIsAdminModalOpen(true)}
+              className="px-6 py-2 bg-amber-500 text-white font-bold text-sm rounded-full hover:bg-amber-600 transition-colors shadow-lg"
+            >
+              <Shield className="w-4 h-4 mr-2 inline" />
+              Open Maintenance Control Center
+            </button>
           </div>
 
-          <div className="row align-items-center justify-content-between gy-3 mt-3 pt-3 border-top border-2 border-dark">
-            <div className="col-12 col-lg-8 d-flex align-items-center gap-2">
-              <span className="badge bg-warning rounded-0 text-dark fw-bold">SECURE</span>
-              <span className="small fw-bold">🛡️ True Admin Portal (Restricted: Authorized Personnel Only • Email Verification Required)</span>
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mt-6 pt-6 border-t border-slate-200">
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold uppercase rounded-full">SECURE</span>
+              <span className="text-sm font-semibold text-slate-700">🛡️ True Admin Portal (Restricted: Authorized Personnel Only)</span>
             </div>
-            <div className="col-12 col-lg-4 text-lg-end">
-              <button
-                onClick={() => setIsTrueAdminOpen(true)}
-                className="btn btn-dark text-white fw-black btn-sm border border-2 border-dark rounded-0 shadow-[2px_2px_0px_0px_black]"
-              >
-                <Shield className="w-4 h-4 me-1" />
-                <span>Open True Admin Portal</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setIsTrueAdminOpen(true)}
+              className="px-6 py-2 bg-slate-900 text-white font-bold text-sm rounded-full hover:bg-slate-800 transition-colors shadow-lg"
+            >
+              <Shield className="w-4 h-4 mr-2 inline" />
+              Open True Admin Portal
+            </button>
           </div>
         </div>
       </div>
