@@ -127,11 +127,17 @@ export default function App() {
         // fallback
       }
     }
-    return INITIAL_STUDENTS[0];
+    return null;
   });
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [showGate, setShowGate] = useState<boolean>(false);
+  const [showGate, setShowGate] = useState<boolean>(() => {
+    if (typeof sessionStorage !== 'undefined') {
+      const entered = sessionStorage.getItem('verdetech_gate_entered');
+      if (entered === 'true') return false;
+    }
+    return true;
+  });
   const [soundEnabled, setSoundState] = useState<boolean>(() => isSoundEnabled());
 
   const handleToggleSound = () => {
@@ -143,7 +149,7 @@ export default function App() {
   const handleEnterGate = () => {
     setShowGate(false);
     if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem('stai_gate_entered', 'true');
+      sessionStorage.setItem('verdetech_gate_entered', 'true');
     }
   };
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);

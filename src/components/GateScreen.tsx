@@ -142,12 +142,9 @@ export const GateScreen: React.FC<GateScreenProps> = ({
       <div className="relative z-10 my-auto text-center max-w-4xl mx-auto px-4 py-8">
         {!isBooting ? (
           <div className="space-y-6 sm:space-y-8 animate-fadeIn">
-            {/* Kicker */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-400/30 text-cyan-300 text-xs sm:text-sm font-mono tracking-widest uppercase shadow-[0_0_20px_rgba(94,242,255,0.15)]">
-              <span>ISWK</span>
-              <span className="text-cyan-500">•</span>
               <span>Science</span>
-              <span className="text-slate-500">•</span>
+              <span className="text-cyan-500">•</span>
               <span>Technology</span>
               <span className="text-slate-500">•</span>
               <span>Innovation</span>
