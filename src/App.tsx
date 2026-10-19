@@ -46,7 +46,14 @@ import {
   updateMessageReactionInFirestore,
   markDirectMessageAsReadInFirestore
 } from './lib/firebaseSync';
-import { Shield, MessageSquare, Send } from 'lucide-react';
+import { Shield, MessageSquare, Send, Sparkles } from 'lucide-react';
+import { GateScreen } from './components/GateScreen';
+import { StaiWorldsSection } from './components/StaiWorldsSection';
+import { FutureLabSimulator } from './components/FutureLabSimulator';
+import { BuildTheFutureVote } from './components/BuildTheFutureVote';
+import { StaiCountdown } from './components/StaiCountdown';
+import { StudentLeaderboard } from './components/StudentLeaderboard';
+import { isSoundEnabled, setSoundEnabled, playSound } from './utils/soundFx';
 
 export default function App() {
   const [students, setStudents] = useState<Student[]>(() => {
@@ -124,6 +131,21 @@ export default function App() {
   });
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [showGate, setShowGate] = useState<boolean>(false);
+  const [soundEnabled, setSoundState] = useState<boolean>(() => isSoundEnabled());
+
+  const handleToggleSound = () => {
+    const next = !soundEnabled;
+    setSoundState(next);
+    setSoundEnabled(next);
+  };
+
+  const handleEnterGate = () => {
+    setShowGate(false);
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('stai_gate_entered', 'true');
+    }
+  };
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isLogModalOpen, setIsLogModalOpen] = useState<boolean>(false);
   const [isCertificateModalOpen, setIsCertificateModalOpen] = useState<boolean>(false);
@@ -765,7 +787,22 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-[#060913] text-slate-200 relative selection:bg-cyan-500 selection:text-black font-body overflow-x-hidden">
+      {/* Global STAI Cosmic Atmosphere Layer */}
+      <div className="atmos-bg" aria-hidden="true">
+        <div className="atmos-grid"></div>
+        <div className="atmos-lines"></div>
+      </div>
+
+      {/* STAI Opening Screen / Gate */}
+      {showGate && (
+        <GateScreen
+          onEnter={handleEnterGate}
+          soundEnabled={soundEnabled}
+          onToggleSound={handleToggleSound}
+        />
+      )}
+
       {/* Animated Welcome Banner on Login or Registration */}
       {welcomeAnimation && (
         <WelcomeBanner
@@ -799,21 +836,30 @@ export default function App() {
           setIsLoginModalOpen(false);
         }}
         pendingVerificationCount={pendingCount}
+        onOpenGate={() => setShowGate(true)}
+        soundEnabled={soundEnabled}
+        onToggleSound={handleToggleSound}
       />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
+        {/* Dashboard */}
         {activeTab === 'dashboard' && (
-          <CampusDashboard
-            students={rankedStudents}
-            currentStudent={activeStudent}
-            logs={logs}
-            onUpdateStudent={handleUpdateStudent}
-            onOpenCertificateModal={(student) => handleOpenCertificateModal(student)}
-          />
+          <div className="space-y-10">
+            <CampusDashboard
+              students={rankedStudents}
+              currentStudent={activeStudent}
+              logs={logs}
+              onUpdateStudent={handleUpdateStudent}
+              onOpenCertificateModal={(student) => handleOpenCertificateModal(student)}
+            />
+          </div>
         )}
 
+
+
+        {/* 07 · ECO FEED */}
         {activeTab === 'feed' && (
           <CommunityFeed
             posts={feedPosts}
@@ -830,6 +876,7 @@ export default function App() {
           />
         )}
 
+        {/* 08 · REWARDS STORE */}
         {activeTab === 'rewards' && (
           <RewardsStore
             currentStudent={activeStudent}
@@ -847,6 +894,7 @@ export default function App() {
           />
         )}
 
+        {/* 09 · ABOUT US */}
         {activeTab === 'about' && (
           <AboutUsView
             currentStudent={activeStudent}
@@ -938,76 +986,103 @@ export default function App() {
         students={students}
       />
 
-      {/* Footer */}
-      <footer className="bg-white text-dark py-5 mt-5 border-top border-4 border-dark" style={{ boxShadow: '0 -4px 0 0 #121212' }}>
-        <div className="container">
-          <div className="row align-items-center justify-content-between gy-3 text-center text-md-start">
-            <div className="col-12 col-md-auto d-flex align-items-center justify-content-center justify-content-md-start gap-2">
-              <span className="fw-black text-dark fs-6 text-uppercase">Verde Tech Portal</span>
-              <span className="text-muted">•</span>
-              <span className="text-muted small">Sustainability Tracking 2026</span>
+      {/* STAI Future World Telemetry Footer */}
+      <footer className="relative z-10 mt-16 border-t border-white/10 bg-[#040714] text-slate-400 py-12 px-4 sm:px-6 lg:px-8 font-mono text-xs">
+        <div className="max-w-7xl mx-auto space-y-8">
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#5ef2ff] animate-pulse" />
+              <span className="text-white font-bold font-display text-base tracking-wider uppercase">
+                VERDE TECH · FUTURE WORLD 2026
+              </span>
+              <span className="text-slate-600">|</span>
+              <span className="text-cyan-300">ISWK MUSCAT</span>
             </div>
-            <div className="col-12 col-md-auto d-flex flex-wrap align-items-center justify-content-center justify-content-md-end gap-3">
-              <a
-                href="https://whatsapp.com/channel/0029Vb8TDOm7DAWxqSu3yq0O"
-                target="_blank"
+
+            <div className="flex flex-wrap items-center gap-4 text-xs">
+              <span className="text-slate-400">TELEMETRY: 23.59° N · 58.54° E</span>
+              <span className="text-slate-600">•</span>
+              <a 
+                href="https://whatsapp.com/channel/0029Vb8TDOm7DAWxqSu3yq0O" 
+                target="_blank" 
                 rel="noopener noreferrer"
-                className="text-dark text-decoration-none fw-bold small d-flex align-items-center gap-1"
+                className="text-emerald-400 hover:text-white transition-colors flex items-center gap-1.5"
               >
-                <i className="bi bi-whatsapp text-success"></i>
-                <span>WhatsApp Channel</span>
+                <i className="bi bi-whatsapp"></i>
+                <span>Official WhatsApp Channel</span>
               </a>
-              <span className="text-muted">•</span>
-              <button
-                onClick={() => setActiveTab('about')}
-                className="btn btn-link text-dark text-decoration-none p-0 small fw-semibold"
+              <span className="text-slate-600">•</span>
+              <button 
+                onClick={() => {
+                  playSound('click');
+                  setShowGate(true);
+                }}
+                className="text-cyan-400 hover:text-white transition-colors flex items-center gap-1"
               >
-                About Us
-              </button>
-              <span className="text-muted">•</span>
-              <button
-                onClick={() => setActiveTab('support')}
-                className="btn btn-link text-dark text-decoration-none p-0 small fw-bold"
-              >
-                Support Center
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Replay Gate</span>
               </button>
             </div>
           </div>
+
+          {/* Maintenance & Authorized Admin Hardware Consoles */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-2xl bg-black/40 border border-white/10 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono text-[10px] font-bold uppercase">
+                    HARDWARE TELEMETRY
+                  </span>
+                  <span className="text-white font-semibold text-xs">Smart Bin Diagnostic Center</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Inspect sensor arrays, ultrasonic fill telemetry, and battery calibration.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  playSound('click');
+                  setIsAdminModalOpen(true);
+                }}
+                className="px-4 py-2 rounded-full bg-amber-500/10 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/30 font-mono text-xs font-bold transition-all shrink-0"
+              >
+                Launch Console
+              </button>
+            </div>
+
+            <div className="rounded-2xl bg-black/40 border border-white/10 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono text-[10px] font-bold uppercase">
+                    RESTRICTED SECURE
+                  </span>
+                  <span className="text-white font-semibold text-xs">True Admin Portal</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Authorized personnel authentication, point reconciliation & audit ledger.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  playSound('click');
+                  setIsTrueAdminOpen(true);
+                }}
+                className="px-4 py-2 rounded-full bg-cyan-500/10 hover:bg-cyan-400 text-cyan-300 hover:text-slate-950 border border-cyan-500/30 font-mono text-xs font-bold transition-all shrink-0 flex items-center gap-1.5"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>Admin Login</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 pt-4 gap-2">
+            <p>© 2026 Indian School Al Wadi Al Kabir · Science · Technology · Innovation (STAI).</p>
+            <p>Verde Tech Campus Sustainability Platform · Engineered for Future World 2026.</p>
+          </div>
+
         </div>
       </footer>
-
-      {/* Maintenance Control Center & True Admin Portal Banners */}
-      <div className="bg-white border-t border-b border-slate-200 py-8 px-6 text-slate-900">
-        <div className="container max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold uppercase rounded-full">ADMIN</span>
-              <span className="text-sm font-semibold text-slate-700">🔐 Smart Bin Maintenance & Hardware Control</span>
-            </div>
-            <button
-              onClick={() => setIsAdminModalOpen(true)}
-              className="px-6 py-2 bg-amber-500 text-white font-bold text-sm rounded-full hover:bg-amber-600 transition-colors shadow-lg"
-            >
-              <Shield className="w-4 h-4 mr-2 inline" />
-              Open Maintenance Control Center
-            </button>
-          </div>
-
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mt-6 pt-6 border-t border-slate-200">
-            <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold uppercase rounded-full">SECURE</span>
-              <span className="text-sm font-semibold text-slate-700">🛡️ True Admin Portal (Restricted: Authorized Personnel Only)</span>
-            </div>
-            <button
-              onClick={() => setIsTrueAdminOpen(true)}
-              className="px-6 py-2 bg-slate-900 text-white font-bold text-sm rounded-full hover:bg-slate-800 transition-colors shadow-lg"
-            >
-              <Shield className="w-4 h-4 mr-2 inline" />
-              Open True Admin Portal
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Admin Bin Diagnostic Modal */}
       <AdminBinDiagnosticModal

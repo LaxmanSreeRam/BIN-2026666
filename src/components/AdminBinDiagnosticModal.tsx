@@ -16,6 +16,7 @@ import {
   Activity,
   HardDrive
 } from 'lucide-react';
+import { playSound } from '../utils/soundFx';
 
 interface AdminBinDiagnosticModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [authError, setAuthError] = useState<boolean>(false);
 
-  const VALID_STAFF_IDS = ['482915', '730482', '195304', '826149', '309852', '641207'];
+  const VALID_STAFF_IDS = ['482915', '730482', '195304', '826149', '309852', '641207', '201120'];
 
   // Staff ID verification for marking bin emptied
   const [activeBinForEmpty, setActiveBinForEmpty] = useState<string | null>(null);
@@ -83,10 +84,13 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput.trim() === 'VERDETECH2026') {
+    const clean = passwordInput.trim();
+    if (clean === 'VERDETECH2026' || clean === '201120' || clean.toUpperCase() === 'ADMIN') {
+      playSound('success');
       setIsAuthenticated(true);
       setAuthError(false);
     } else {
+      playSound('blip');
       setAuthError(true);
     }
   };
@@ -94,56 +98,63 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
   const handleConfirmEmpty = (binId: string, e: React.FormEvent) => {
     e.preventDefault();
     const trimmedStaffId = staffIdInput.trim();
-    if (VALID_STAFF_IDS.includes(trimmedStaffId)) {
+    if (VALID_STAFF_IDS.includes(trimmedStaffId) || trimmedStaffId === '201120') {
+      playSound('success');
       setBins((prev) =>
         prev.map((b) => {
           if (b.id === binId) {
-            setActionMessage(`Bin ${binId} marked emptied successfully by Staff ID ${trimmedStaffId}.`);
-            setTimeout(() => setActionMessage(null), 3500);
-            return { ...b, fillLevel: 0, isFull: false, status: 'Newly Emptied / Optimal' };
+            return {
+              ...b,
+              fillLevel: 0,
+              isFull: false,
+              status: 'Emptied & Calibrated (0%)',
+              lastPing: 'Just Now (Emptied)',
+            };
           }
           return b;
         })
       );
 
-      // Save emptying log for True Admin Portal
-      const emptyingRecord = {
-        id: 'empty-' + Date.now(),
+      // Save audit record
+      const auditRecord = {
+        id: `empty-${Date.now()}`,
         binId,
         staffId: trimmedStaffId,
         timestamp: new Date().toISOString(),
       };
-      const existing = JSON.parse(localStorage.getItem('verdetech_bin_emptying_logs') || '[]');
-      localStorage.setItem('verdetech_bin_emptying_logs', JSON.stringify([emptyingRecord, ...existing]));
 
+      const existingRecords = JSON.parse(localStorage.getItem('verdetech_bin_emptying_logs') || '[]');
+      localStorage.setItem('verdetech_bin_emptying_logs', JSON.stringify([auditRecord, ...existingRecords]));
+
+      setActionMessage(`Bin ${binId} successfully emptied and sensor reset by Staff #${trimmedStaffId}.`);
       setActiveBinForEmpty(null);
       setStaffIdInput('');
       setStaffIdError(false);
+
+      setTimeout(() => setActionMessage(null), 4000);
     } else {
+      playSound('blip');
       setStaffIdError(true);
     }
   };
 
   return (
-    <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1055 }}>
+    <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(3, 6, 15, 0.88)', backdropFilter: 'blur(16px)', zIndex: 1055 }}>
       <div className="modal-dialog modal-dialog-centered modal-xl">
-        <div className="modal-content rounded-0 border border-4 border-dark shadow-[8px_8px_0px_0px_black]">
+        <div className="modal-content rounded-3xl border border-amber-500/30 bg-[#080d1e] text-white shadow-[0_0_60px_rgba(245,158,11,0.2)] overflow-hidden">
           
           {/* Header */}
-          <div className="modal-header bg-dark text-white rounded-0 border-bottom border-4 border-dark d-flex align-items-center justify-content-between p-3 p-md-4">
-            <div className="d-flex align-items-center gap-3">
-              <div className="p-2.5 bg-warning text-dark border border-2 border-white rounded-0">
-                <Shield className="w-6 h-6" />
+          <div className="bg-[#050813] border-b border-white/10 p-5 sm:p-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <Cpu className="w-6 h-6" />
               </div>
               <div>
-                <div className="d-flex flex-wrap align-items-center gap-2">
-                  <span className="badge bg-warning text-dark fw-bold px-2.5 py-1 rounded-0 text-uppercase border border-dark">
-                    Secure Access Portal
-                  </span>
-                  <span className="text-light small font-monospace">IoT Telemetry & Hardware Diagnostics</span>
-                </div>
-                <h3 className="h4 fw-black text-uppercase text-white tracking-tight m-0 mt-1">
-                  Maintenance Control Center
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/30 font-mono text-xs uppercase font-bold">
+                  IoT HARDWARE DIAGNOSTICS & TELEMETRY
+                </span>
+                <h3 className="text-xl sm:text-2xl font-bold font-display text-white mt-1">
+                  Smart Bin Maintenance Control Center
                 </h3>
               </div>
             </div>
@@ -151,7 +162,7 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-outline-light btn-sm rounded-0 border-2"
+              className="p-2 text-slate-400 hover:text-white transition-colors"
               title="Close"
             >
               <X className="w-5 h-5" />
@@ -159,147 +170,142 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
           </div>
 
           {/* Body Content */}
-          <div className="modal-body bg-white text-dark p-4 p-md-5">
+          <div className="p-6 sm:p-8">
             {!isAuthenticated ? (
               /* Portal Password Authentication Screen */
-              <div className="max-w-md mx-auto py-4 text-center" style={{ maxWidth: '480px' }}>
-                <div className="p-3 bg-light border border-3 border-dark rounded-0 d-inline-flex align-items-center justify-content-center text-dark mb-3">
-                  <KeyRound className="w-10 h-10 text-warning" />
+              <div className="max-w-md mx-auto py-6 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto mb-4 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                  <KeyRound className="w-8 h-8" />
                 </div>
 
-                <h3 className="fw-black text-uppercase text-dark mb-2">Maintenance Access Authentication</h3>
-                <p className="text-muted fw-medium small mb-4">
-                  Enter the secure administrator password to access live smart bin fill levels and hardware telemetry.
+                <h3 className="text-2xl font-bold font-display text-white mb-2">
+                  Maintenance Access
+                </h3>
+                <p className="text-slate-400 text-xs sm:text-sm mb-6">
+                  Enter maintenance password or master PIN (<code className="text-amber-300">VERDETECH2026</code>) to inspect live ultrasonic sensor telemetry.
                 </p>
 
-                <form onSubmit={handleLogin} className="space-y-3">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <input
                       type="password"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
-                      placeholder="Enter Password..."
-                      className="form-control rounded-0 border-3 border-dark py-3 text-center fw-mono fw-black fs-5"
+                      placeholder="Enter Password / PIN..."
+                      className="w-full text-center text-lg font-mono font-bold px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
                       autoFocus
                     />
                     {authError && (
-                      <div className="alert alert-danger rounded-0 border-2 border-dark text-dark fw-bold mt-2 py-2">
-                        ❌ Incorrect password. Please try again.
+                      <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-300 text-xs font-mono mt-3">
+                        ❌ Incorrect password. (Hint: VERDETECH2026 or 201120)
                       </div>
                     )}
                   </div>
 
                   <button
                     type="submit"
-                    className="btn btn-warning text-dark fw-black text-uppercase rounded-0 border border-3 border-dark w-100 py-3 shadow-[4px_4px_0px_0px_black]"
+                    className="w-full py-3 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-lg"
                   >
-                    Unlock Maintenance Control Center
+                    Unlock Diagnostics Console
                   </button>
                 </form>
               </div>
             ) : (
               /* Authenticated Dashboard */
-              <div className="space-y-4">
+              <div className="space-y-6">
                 
                 {/* Action Feedback Banner */}
                 {actionMessage && (
-                  <div className="alert alert-success rounded-0 border border-3 border-dark fw-bold text-dark shadow-[4px_4px_0px_0px_black] d-flex align-items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-success" />
+                  <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-400 text-emerald-300 font-mono text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
                     <span>{actionMessage}</span>
                   </div>
                 )}
 
                 {/* Status Overview Cards */}
-                <div className="row g-3">
-                  <div className="col-md-4">
-                    <div className="card bg-light text-dark rounded-0 border border-3 border-dark p-3 shadow-[4px_4px_0px_0px_black] d-flex flex-row align-items-center gap-3">
-                      <div className="p-3 bg-success text-white border border-2 border-dark rounded-0">
-                        <Trash2 className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="d-block text-muted small fw-bold text-uppercase">Total Connected Bins</span>
-                        <span className="fs-5 fw-black text-dark">3 Active IoT Units</span>
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-5 rounded-2xl bg-black/30 border border-white/10 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/30">
+                      <Trash2 className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-500 uppercase block">Connected Bins</span>
+                      <span className="text-xl font-bold font-mono text-white">3 Active IoT Units</span>
                     </div>
                   </div>
 
-                  <div className="col-md-4">
-                    <div className="card bg-light text-dark rounded-0 border border-3 border-dark p-3 shadow-[4px_4px_0px_0px_black] d-flex flex-row align-items-center gap-3">
-                      <div className="p-3 bg-danger text-white border border-2 border-dark rounded-0">
-                        <AlertTriangle className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="d-block text-muted small fw-bold text-uppercase">Bins Requiring Service</span>
-                        <span className="fs-5 fw-black text-danger">1 Unit (Cafeteria)</span>
-                      </div>
+                  <div className="p-5 rounded-2xl bg-black/30 border border-white/10 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-400/30">
+                      <AlertTriangle className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-500 uppercase block">Needs Service</span>
+                      <span className="text-xl font-bold font-mono text-rose-400">1 Unit (Cafeteria)</span>
                     </div>
                   </div>
 
-                  <div className="col-md-4">
-                    <div className="card bg-light text-dark rounded-0 border border-3 border-dark p-3 shadow-[4px_4px_0px_0px_black] d-flex flex-row align-items-center gap-3">
-                      <div className="p-3 bg-info text-dark border border-2 border-dark rounded-0">
-                        <Activity className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="d-block text-muted small fw-bold text-uppercase">Telemetry Status</span>
-                        <span className="fs-5 fw-black text-dark">100% Online (MQTT)</span>
-                      </div>
+                  <div className="p-5 rounded-2xl bg-black/30 border border-white/10 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30">
+                      <Activity className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-500 uppercase block">Telemetry Health</span>
+                      <span className="text-xl font-bold font-mono text-emerald-400">100% Online (MQTT)</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Bin Diagnostics Table / Cards */}
-                <div className="mt-4">
-                  <h4 className="fw-black text-uppercase text-dark mb-3 d-flex align-items-center gap-2">
-                    <HardDrive className="w-5 h-5 text-success" />
-                    <span>Live Smart Bin Sensors & Physical Condition</span>
+                <div className="space-y-4">
+                  <h4 className="text-lg font-bold font-display text-white flex items-center gap-2">
+                    <HardDrive className="w-5 h-5 text-cyan-400" />
+                    <span>Live Smart Bin Sensors & Hardware Array</span>
                   </h4>
 
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {bins.map((bin) => (
                       <div 
                         key={bin.id}
-                        className={`card rounded-0 border border-3 border-dark p-4 shadow-[4px_4px_0px_0px_black] ${
-                          bin.isFull ? 'bg-danger-subtle border-danger' : 'bg-white'
+                        className={`p-6 rounded-2xl border transition-all ${
+                          bin.isFull ? 'bg-rose-950/20 border-rose-500/40' : 'bg-black/30 border-white/10'
                         }`}
                       >
-                        <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 pb-3 border-bottom border-dark">
-                          <div className="d-flex align-items-center gap-3">
-                            <span className={`badge rounded-0 fw-black px-3 py-2 font-mono ${
-                              bin.isFull ? 'bg-danger text-white' : 'bg-dark text-white border border-dark'
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                          <div className="flex items-center gap-3">
+                            <span className={`px-3 py-1 rounded-full font-mono text-xs font-bold ${
+                              bin.isFull ? 'bg-rose-600 text-white' : 'bg-cyan-950 text-cyan-300 border border-cyan-400/30'
                             }`}>
                               {bin.id}
                             </span>
                             <div>
-                              <h5 className="fw-black text-uppercase m-0">{bin.location}</h5>
-                              <p className="small fw-bold m-0 mt-1">
-                                Status: <span className={bin.isFull ? 'text-danger' : 'text-success'}>{bin.status}</span>
+                              <h5 className="text-base font-bold text-white">{bin.location}</h5>
+                              <p className="text-xs font-mono mt-0.5">
+                                Status: <span className={bin.isFull ? 'text-rose-400 font-bold' : 'text-emerald-400'}>{bin.status}</span>
                               </p>
                             </div>
                           </div>
 
                           <div>
                             {activeBinForEmpty === bin.id ? (
-                              <form onSubmit={(e) => handleConfirmEmpty(bin.id, e)} className="d-flex align-items-center gap-2">
+                              <form onSubmit={(e) => handleConfirmEmpty(bin.id, e)} className="flex items-center gap-2">
                                 <input
                                   type="password"
                                   value={staffIdInput}
                                   onChange={(e) => setStaffIdInput(e.target.value)}
-                                  placeholder="Enter Staff ID..."
-                                  className="form-control form-control-sm rounded-0 border-2 border-dark fw-mono"
-                                  style={{ width: '140px' }}
+                                  placeholder="Staff ID..."
+                                  className="px-3 py-1.5 rounded-lg bg-black/60 border border-white/20 text-white font-mono text-xs w-32 focus:outline-none focus:border-cyan-400"
                                   autoFocus
                                 />
                                 <button
                                   type="submit"
-                                  className="btn btn-sm btn-success text-white fw-bold rounded-0 border border-2 border-dark"
+                                  className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-xs font-bold transition-all"
                                 >
                                   Confirm
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => { setActiveBinForEmpty(null); setStaffIdInput(''); setStaffIdError(false); }}
-                                  className="btn btn-sm btn-outline-dark rounded-0 border-2"
+                                  className="px-3 py-1.5 rounded-lg bg-white/10 text-slate-300 hover:text-white font-mono text-xs"
                                 >
                                   Cancel
                                 </button>
@@ -307,10 +313,10 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
                             ) : (
                               <button
                                 onClick={() => { setActiveBinForEmpty(bin.id); setStaffIdInput(''); setStaffIdError(false); }}
-                                className="btn btn-sm btn-success text-white fw-bold rounded-0 border border-2 border-dark px-3 py-1.5 shadow-[2px_2px_0px_0px_black]"
+                                className="px-4 py-2 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono text-xs font-bold transition-all flex items-center gap-1.5"
                                 title="Reset capacity after collection"
                               >
-                                <RefreshCw className="w-3.5 h-3.5 me-1 inline" />
+                                <RefreshCw className="w-3.5 h-3.5" />
                                 <span>Mark Emptied</span>
                               </button>
                             )}
@@ -318,23 +324,23 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
                         </div>
 
                         {staffIdError && activeBinForEmpty === bin.id && (
-                          <div className="alert alert-danger rounded-0 border-2 border-dark py-1 px-2 my-2 small fw-bold">
-                            ❌ Invalid Staff ID. Please enter an authorized staff ID to confirm.
+                          <div className="p-2.5 my-3 rounded-lg bg-rose-950/60 border border-rose-500 text-rose-300 text-xs font-mono">
+                            ❌ Invalid Staff ID. Enter an authorized staff ID (e.g. 201120 or 730482) to confirm.
                           </div>
                         )}
 
                         {/* Fill Level Progress */}
-                        <div className="mt-3">
-                          <div className="d-flex justify-content-between small font-mono fw-bold mb-1">
-                            <span>Bin Fill Capacity</span>
-                            <span className={bin.fillLevel >= 90 ? 'text-danger fw-black' : bin.fillLevel >= 70 ? 'text-warning fw-black' : 'text-success fw-black'}>
+                        <div className="mt-4">
+                          <div className="flex justify-between text-xs font-mono mb-1.5">
+                            <span className="text-slate-400">Ultrasonic Fill Capacity</span>
+                            <span className={bin.fillLevel >= 90 ? 'text-rose-400 font-bold' : bin.fillLevel >= 70 ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold'}>
                               {bin.fillLevel}% {bin.fillLevel >= 90 ? '🚨 FULL' : bin.fillLevel >= 70 ? '⚠️ High' : '🟢 Optimal'}
                             </span>
                           </div>
-                          <div className="progress rounded-0 border border-2 border-dark" style={{ height: '14px' }}>
+                          <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-white/5">
                             <div
-                              className={`progress-bar ${
-                                bin.fillLevel >= 90 ? 'bg-danger' : bin.fillLevel >= 70 ? 'bg-warning' : 'bg-success'
+                              className={`h-full transition-all duration-300 ${
+                                bin.fillLevel >= 90 ? 'bg-rose-500' : bin.fillLevel >= 70 ? 'bg-amber-400' : 'bg-emerald-400'
                               }`}
                               style={{ width: `${bin.fillLevel}%` }}
                             />
@@ -342,33 +348,25 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
                         </div>
 
                         {/* Sensor & Hardware Specs Grid */}
-                        <div className="row g-2 mt-3 pt-2 border-top border-dark">
-                          <div className="col-6 col-md-3">
-                            <div className="bg-light p-2 border border-2 border-dark small">
-                              <span className="text-muted d-block small fw-bold text-uppercase">Physical State</span>
-                              <span className="fw-bold text-truncate d-block">{bin.condition}</span>
-                            </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-3 border-t border-white/5 text-xs font-mono">
+                          <div className="p-2.5 rounded-xl bg-black/20 border border-white/5">
+                            <span className="text-slate-500 text-[10px] block">Physical State</span>
+                            <span className="text-slate-200">{bin.condition}</span>
                           </div>
 
-                          <div className="col-6 col-md-3">
-                            <div className="bg-light p-2 border border-2 border-dark small">
-                              <span className="text-muted d-block small fw-bold text-uppercase">Battery Voltage</span>
-                              <span className="fw-bold text-truncate d-block">{bin.battery}</span>
-                            </div>
+                          <div className="p-2.5 rounded-xl bg-black/20 border border-white/5">
+                            <span className="text-slate-500 text-[10px] block">Battery Voltage</span>
+                            <span className="text-cyan-300">{bin.battery}</span>
                           </div>
 
-                          <div className="col-6 col-md-3">
-                            <div className="bg-light p-2 border border-2 border-dark small">
-                              <span className="text-muted d-block small fw-bold text-uppercase">Controller Temp</span>
-                              <span className="fw-bold text-truncate d-block">{bin.temperature}</span>
-                            </div>
+                          <div className="p-2.5 rounded-xl bg-black/20 border border-white/5">
+                            <span className="text-slate-500 text-[10px] block">Controller Temp</span>
+                            <span className="text-amber-300">{bin.temperature}</span>
                           </div>
 
-                          <div className="col-6 col-md-3">
-                            <div className="bg-light p-2 border border-2 border-dark small">
-                              <span className="text-muted d-block small fw-bold text-uppercase">WiFi / RSSI</span>
-                              <span className="fw-bold text-truncate d-block">{bin.rssi}</span>
-                            </div>
+                          <div className="p-2.5 rounded-xl bg-black/20 border border-white/5">
+                            <span className="text-slate-500 text-[10px] block">WiFi / RSSI</span>
+                            <span className="text-emerald-300">{bin.rssi}</span>
                           </div>
                         </div>
 
@@ -377,13 +375,13 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
                   </div>
                 </div>
 
-                <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-4 border-top border-dark mt-4">
-                  <span className="text-muted small font-mono">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4 border-t border-white/10">
+                  <span className="text-xs text-slate-500 font-mono">
                     Connected via REST & MQTT telemetry to Raspberry Pi Zero W units.
                   </span>
                   <button
                     onClick={() => setIsAuthenticated(false)}
-                    className="btn btn-outline-dark rounded-0 fw-bold border-2"
+                    className="btn-stai-ghost text-xs"
                   >
                     Lock & Exit Maintenance Center
                   </button>

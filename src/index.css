@@ -1,31 +1,321 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=Syne:wght@500;600;700;800&display=swap');
 
 :root {
-  --verde-emerald: #059669;
-  --verde-cobalt: #0284C7;
-  --verde-amber: #F59E0B;
-  --verde-canvas: #F8FAFC;
-  --verde-black: #0F172A;
+  color-scheme: dark;
+  
+  /* STAI Official Color Tokens */
+  --white: #ffffff;
+  --black: #000000;
+  
+  --cyan: #5ef2ff;
+  --cyan-rgb: 94, 242, 255;
+  --violet: #9d7bff;
+  --violet-rgb: 157, 123, 255;
+  --magenta: #ff6ad5;
+  --magenta-rgb: 255, 106, 213;
+  --neon-green: #39ff14;
+  --neon-green-rgb: 57, 255, 20;
+  --emerald: #4dffc3;
+  --warning: #ffd166;
+  --danger: #ff4d6d;
+  
+  --color-bg: #060913;
+  --color-bg-2: #0a0e1d;
+  --color-bg-3: #0f1428;
+  --color-surface: rgba(255, 255, 255, 0.035);
+  --color-surface-hover: rgba(255, 255, 255, 0.07);
+  --color-surface-active: rgba(94, 242, 255, 0.08);
+  
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-glow: rgba(94, 242, 255, 0.3);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  
+  --color-heading: #f4f6ff;
+  --color-text: #d9deef;
+  --color-text-muted: #8b93b3;
+  --color-text-dim: #5a628a;
+  
+  --glow-cyan: 0 0 24px rgba(94, 242, 255, 0.35), 0 0 64px rgba(94, 242, 255, 0.15);
+  --glow-violet: 0 0 24px rgba(157, 123, 255, 0.35), 0 0 64px rgba(157, 123, 255, 0.15);
+  --glow-green: 0 0 24px rgba(57, 255, 20, 0.35), 0 0 64px rgba(57, 255, 20, 0.15);
+  
+  --display-font: 'Syne', sans-serif;
+  --body-font: 'Manrope', sans-serif;
+  --mono-font: 'JetBrains Mono', monospace;
 }
 
-body {
-  background-color: var(--verde-canvas) !important;
-  color: var(--verde-black) !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+/* Global Reset & Base */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
+  font-family: var(--body-font) !important;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Bricolage Grotesque', sans-serif !important;
+.stai-body {
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
+  overflow-x: hidden;
 }
 
-.mission-card {
-  background-color: #ffffff;
-  border: 1px solid #E2E8F0;
-  border-radius: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+h1, h2, h3, h4, .stai-heading, .font-display {
+  font-family: var(--display-font) !important;
+  color: var(--color-heading);
+  letter-spacing: -0.02em;
 }
 
-.mission-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.mono, .font-mono {
+  font-family: var(--mono-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Atmospheric Layer - Cosmic Grid & Nebulas matching STAI */
+.atmos-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 15% 15%, rgba(94, 242, 255, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 85% 25%, rgba(157, 123, 255, 0.1) 0%, transparent 45%),
+              radial-gradient(circle at 50% 80%, rgba(57, 255, 20, 0.04) 0%, transparent 50%),
+              #060913;
+}
+
+.atmos-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 60%, transparent 100%);
+}
+
+.atmos-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(94, 242, 255, 0.5) 50%, transparent 100%);
+}
+
+/* STAI Glowing Text Gradient */
+.stai-gradient-text {
+  background: linear-gradient(92deg, #c9fbff 0%, var(--cyan) 35%, var(--violet) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stai-gradient-green {
+  background: linear-gradient(92deg, #ffffff 0%, var(--emerald) 40%, var(--neon-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glass Cards */
+.stai-card {
+  background: rgba(10, 14, 29, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--color-text);
+  position: relative;
+}
+
+.stai-card:hover {
+  border-color: var(--color-border-glow);
+  box-shadow: 0 10px 30px -10px rgba(94, 242, 255, 0.15);
+}
+
+.stai-card-glow {
+  border: 1px solid rgba(94, 242, 255, 0.3);
+  box-shadow: 0 0 25px rgba(94, 242, 255, 0.12);
+}
+
+/* Interactive STAI Buttons */
+.btn-stai-cyan {
+  background: linear-gradient(92deg, rgba(94, 242, 255, 0.9) 0%, rgba(157, 123, 255, 0.9) 100%);
+  color: #060913 !important;
+  font-family: var(--display-font);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 24px;
+  box-shadow: 0 0 20px rgba(94, 242, 255, 0.3);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-stai-cyan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(94, 242, 255, 0.55);
+  color: #000000 !important;
+}
+
+.btn-stai-outline {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(94, 242, 255, 0.3);
+  color: var(--cyan) !important;
+  font-family: var(--mono-font);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-stai-outline:hover {
+  background: rgba(94, 242, 255, 0.12);
+  border-color: var(--cyan);
+  box-shadow: 0 0 16px rgba(94, 242, 255, 0.25);
+  color: #ffffff !important;
+}
+
+.btn-stai-ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  font-family: var(--body-font);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+}
+
+.btn-stai-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-heading);
+  border-color: var(--color-border-strong);
+}
+
+/* HUD telemetry indicators matching iswkoman.com/stai */
+.hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 14, 29, 0.85);
+  border: 1px solid rgba(94, 242, 255, 0.2);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-family: var(--mono-font);
+  font-size: 0.75rem;
+  color: var(--cyan);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hud-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: 0 0 8px var(--neon-green);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+.hud-dot-cyan {
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Numbered Navigation as seen in iswkoman.com/stai */
+.stai-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.stai-nav-link .mono-index {
+  font-family: var(--mono-font);
+  font-size: 0.6875rem;
+  color: var(--cyan);
+  opacity: 0.7;
+}
+
+.stai-nav-link:hover, .stai-nav-link.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  text-shadow: 0 0 12px rgba(94, 242, 255, 0.4);
+}
+
+.stai-nav-link.active .mono-index {
+  opacity: 1;
+  text-shadow: 0 0 8px var(--cyan);
+}
+
+/* Override bootstrap tables, inputs & modal dark defaults */
+.table {
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-color: var(--color-border) !important;
+}
+
+.modal-content {
+  background-color: var(--color-bg-2) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border-strong) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+.form-control, .form-select {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--color-border-strong) !important;
+  color: #ffffff !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--cyan) !important;
+  box-shadow: 0 0 0 0.25rem rgba(94, 242, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(94, 242, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(94, 242, 255, 0.4);
 }

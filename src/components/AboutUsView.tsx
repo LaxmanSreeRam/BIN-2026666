@@ -1,24 +1,9 @@
 import React from 'react';
 import {
-  Leaf,
-  Target,
-  Award,
-  Users,
-  ShieldCheck,
-  Globe,
   Sparkles,
-  Mail,
-  Heart,
-  CheckCircle2,
-  TreePine,
-  Zap,
-  Recycle,
-  Building2,
   ArrowRight,
-  Info,
-  MessageSquare,
-  ExternalLink,
   Megaphone,
+  Globe2,
   Share2
 } from 'lucide-react';
 import { Student } from '../types';
@@ -34,38 +19,41 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
   onNavigateToTab,
 }) => {
   return (
-    <div className="container py-4 space-y-4">
+    <div className="space-y-8">
       
-      {/* Hero Section - Eco Yellow */}
-      <div className="card rounded-0 p-4 p-md-5 text-dark border border-4 border-dark shadow-[8px_8px_0px_0px_black]" style={{ backgroundColor: '#F0C020' }}>
-        <div className="max-w-3xl space-y-3">
-          <div className="badge bg-dark text-white fw-black px-3 py-2 rounded-0 text-uppercase border border-2 border-dark">
-            <Sparkles className="w-3.5 h-3.5 me-1 text-warning" />
-            Official Platform Overview
+      {/* Hero Section - STAI Glass Card */}
+      <div className="relative rounded-3xl border border-white/10 bg-[#080d1e]/90 backdrop-blur-2xl p-6 sm:p-10 shadow-2xl overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="relative z-10 max-w-3xl space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-400/30 text-cyan-300 font-mono text-xs uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Official Platform Overview</span>
           </div>
 
-          <h1 className="display-5 fw-black text-dark text-uppercase tracking-tight m-0">
-            About Verde Tech Portal
+          <h1 className="text-3xl sm:text-5xl font-extrabold font-display text-white tracking-tight leading-tight">
+            About Verde Tech <br />
+            <span className="stai-gradient-text">Future World Portal</span>
           </h1>
 
-          <p className="text-dark fw-bold fs-6 m-0 opacity-90">
-            The Verde Tech Portal is our school's official sustainability tracking platform designed to inspire, measure, and reward everyday environmental actions. From smart bin recycling to energy conservation, every positive step counts toward a greener campus.
+          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+            The Verde Tech Portal is our school's official sustainability tracking and eco-innovation platform designed to inspire, measure, and reward verified environmental actions. From optical smart bin recycling to solar efficiency and classroom audits, every positive action powers campus progress toward STAI 2026.
           </p>
 
-          <div className="pt-2 d-flex flex-wrap gap-3">
+          <div className="pt-2 flex flex-wrap gap-3">
             {onNavigateToTab && (
               <button
                 onClick={() => onNavigateToTab('feed')}
-                className="btn btn-danger text-white fw-black text-uppercase rounded-0 border border-4 border-dark px-4 py-3 shadow-[4px_4px_0px_0px_black]"
+                className="btn-stai-cyan text-xs sm:text-sm"
               >
                 <span>Explore Eco Feed</span>
-                <ArrowRight className="w-4 h-4 ms-2 inline" />
+                <ArrowRight className="w-4 h-4 ml-1 inline" />
               </button>
             )}
             {onNavigateToTab && (
               <button
                 onClick={() => onNavigateToTab('rewards')}
-                className="btn btn-light text-dark fw-black text-uppercase rounded-0 border border-4 border-dark px-4 py-3 shadow-[4px_4px_0px_0px_black]"
+                className="btn-stai-outline text-xs sm:text-sm"
               >
                 <span>Browse Rewards</span>
               </button>
@@ -74,26 +62,26 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
         </div>
       </div>
 
-      {/* Official Social Media Channels Banner - Royal Blue */}
-      <div className="card rounded-0 p-4 p-md-5 text-white border border-4 border-dark shadow-[6px_6px_0px_0px_black]" style={{ backgroundColor: '#1040C0' }}>
-        <div className="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+      {/* Official Social Media Channels Banner */}
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-violet-950/40 p-6 sm:p-8 shadow-xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
-            <div className="badge bg-warning text-dark fw-black px-3 py-2 rounded-0 text-uppercase mb-2 border border-2 border-dark">
-              <Megaphone className="w-3.5 h-3.5 me-1" />
-              Official Handles
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-mono text-xs uppercase mb-3">
+              <Megaphone className="w-3.5 h-3.5" />
+              <span>Official Channels</span>
             </div>
-            <h2 className="h3 fw-black text-white text-uppercase m-0">Follow Us On:</h2>
-            <p className="text-light small mt-1 m-0 fw-medium">
-              Connect with Verde Tech across our official social channels for live campus updates, competition notices, and eco highlights.
+            <h2 className="text-2xl font-bold font-display text-white">Follow ISWK Verde Tech</h2>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1">
+              Connect with Verde Tech across official social channels for live campus updates, competition notices, and eco highlights.
             </p>
           </div>
 
-          <div className="d-flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5 shrink-0">
             <a
               href="https://www.instagram.com/verdetechsystems?stkn=MWcxbGRhYThyN2VlOA=="
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-light fw-black rounded-0 border border-2 border-dark px-3 py-2 text-dark text-uppercase shadow-[2px_2px_0px_0px_black]"
+              className="px-4 py-2 rounded-xl bg-black/40 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-slate-200 hover:text-white font-mono text-xs transition-all"
             >
               Instagram
             </a>
@@ -101,7 +89,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
               href="https://www.linkedin.com/company/verdetechsystemss"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-light fw-black rounded-0 border border-2 border-dark px-3 py-2 text-dark text-uppercase shadow-[2px_2px_0px_0px_black]"
+              className="px-4 py-2 rounded-xl bg-black/40 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-slate-200 hover:text-white font-mono text-xs transition-all"
             >
               LinkedIn
             </a>
@@ -109,7 +97,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
               href="https://www.facebook.com/profile.php?id=61594541660052"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-light fw-black rounded-0 border border-2 border-dark px-3 py-2 text-dark text-uppercase shadow-[2px_2px_0px_0px_black]"
+              className="px-4 py-2 rounded-xl bg-black/40 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-slate-200 hover:text-white font-mono text-xs transition-all"
             >
               Facebook
             </a>
@@ -117,7 +105,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
               href="https://www.youtube.com/channel/UCilJpKT3EpbNywLsUycQbFw"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-light fw-black rounded-0 border border-2 border-dark px-3 py-2 text-dark text-uppercase shadow-[2px_2px_0px_0px_black]"
+              className="px-4 py-2 rounded-xl bg-black/40 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-slate-200 hover:text-white font-mono text-xs transition-all"
             >
               YouTube
             </a>
@@ -126,8 +114,10 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
       </div>
 
       {/* Team Bios Section */}
-      <div className="card rounded-0 border border-4 border-dark p-4 p-md-5 shadow-[6px_6px_0px_0px_black] bg-white text-dark">
-        <h3 className="h4 fw-black text-dark text-uppercase mb-4">Leadership & Team Bios</h3>
+      <div className="stai-card p-6 sm:p-8">
+        <h3 className="text-xl sm:text-2xl font-bold font-display text-white mb-6">
+          Leadership & Student Innovators
+        </h3>
         <TeamBiosSection currentStudent={currentStudent} />
       </div>
 

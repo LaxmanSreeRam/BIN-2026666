@@ -18,6 +18,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { syncTeamBios, saveTeamBioToFirestore } from '../lib/firebaseSync';
+import { playSound } from '../utils/soundFx';
 
 interface TeamBiosSectionProps {
   currentStudent?: Student | null;
@@ -58,65 +59,53 @@ export const INITIAL_TEAM_BIOS: TeamMemberBio[] = [
     isLead: true,
   },
   {
-    id: 'bio-talha',
-    name: 'Talha Faizi',
-    role: 'Technical Components Coder',
-    aboutMe: 'Creative coder interested in embedded systems, efficient firmware logic, and interactive digital experiences.',
-    bio: 'Develops microcontroller logic routines, sensor verification scripts, and component communication protocols connecting the physical Smart Bins to the school network.',
-    whyVerdeTechSpecial: 'VerdeTech gave our team a chance to build something with meaningful purpose. Every circuit calibrated and algorithm written directly helps make our school grounds cleaner, greener, and more technologically forward-thinking.',
+    id: 'bio-arav',
+    name: 'Arav Goel',
+    role: 'Project Lead - Technical Components Handler',
+    aboutMe: 'Hardware and embedded engineering enthusiast passionate about smart bins, microcontrollers, and IoT sensor networks.',
+    bio: 'Assists in designing hardware enclosures, power distribution, and load cell calibration routines for verified recycling telemetry.',
+    whyVerdeTechSpecial: 'I love how VerdeTech makes waste reduction practical and immediate. Rewarding clean student choices on the spot encourages our school to lead by example for Oman 2040 sustainability visions.',
     avatarUrl: '',
-    isLead: false,
+    linkedinUrl: 'https://www.linkedin.com/in/arav-goel-226875326/',
+    isLead: true,
   },
 ];
 
 export const TeamBiosSection: React.FC<TeamBiosSectionProps> = ({ currentStudent }) => {
   const [teamBios, setTeamBios] = useState<TeamMemberBio[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('verdetech_team_bios');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        } catch {
-          // fallback
-        }
-      }
+    const saved = localStorage.getItem('verdetech_team_bios');
+    if (!saved) return INITIAL_TEAM_BIOS;
+    try {
+      const parsed: TeamMemberBio[] = JSON.parse(saved);
+      return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_TEAM_BIOS;
+    } catch {
+      return INITIAL_TEAM_BIOS;
     }
-    return INITIAL_TEAM_BIOS;
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<TeamMemberBio | null>(null);
   const [saveSuccessNotice, setSaveSuccessNotice] = useState<string | null>(null);
 
+  // Firestore real-time synchronization
   useEffect(() => {
-    const unsub = syncTeamBios((remoteBios) => {
-      if (remoteBios && remoteBios.length > 0) {
-        setTeamBios((prev) => {
-          const merged = [...prev];
-          remoteBios.forEach((remote) => {
-            const idx = merged.findIndex((m) => m.id === remote.id);
-            if (idx >= 0) {
-              merged[idx] = { ...merged[idx], ...remote };
-            } else {
-              merged.push(remote);
-            }
-          });
-          localStorage.setItem('verdetech_team_bios', JSON.stringify(merged));
-          return merged;
-        });
+    const unsubscribe = syncTeamBios((firestoreBios) => {
+      if (firestoreBios && firestoreBios.length > 0) {
+        setTeamBios(firestoreBios);
+        localStorage.setItem('verdetech_team_bios', JSON.stringify(firestoreBios));
       }
     });
-
-    return () => unsub();
+    return () => unsubscribe();
   }, []);
 
   const handleStartEdit = (member: TeamMemberBio) => {
+    playSound('click');
     setEditingId(member.id);
     setFormData({ ...member });
   };
 
   const handleCancelEdit = () => {
+    playSound('click');
     setEditingId(null);
     setFormData(null);
   };
@@ -125,6 +114,7 @@ export const TeamBiosSection: React.FC<TeamBiosSectionProps> = ({ currentStudent
     e.preventDefault();
     if (!formData) return;
 
+    playSound('success');
     const updated = {
       ...formData,
       updatedAt: new Date().toISOString(),
@@ -144,31 +134,16 @@ export const TeamBiosSection: React.FC<TeamBiosSectionProps> = ({ currentStudent
     setFormData(null);
   };
 
-  const handleResetToDefault = (memberId: string) => {
-    const def = INITIAL_TEAM_BIOS.find((b) => b.id === memberId);
-    if (!def) return;
-    if (confirm(`Reset ${def.name}'s bio to initial template?`)) {
-      setTeamBios((prev) => {
-        const next = prev.map((m) => (m.id === def.id ? def : m));
-        localStorage.setItem('verdetech_team_bios', JSON.stringify(next));
-        return next;
-      });
-      saveTeamBioToFirestore(def);
-      setSaveSuccessNotice(`Reset bio for ${def.name}`);
-      setTimeout(() => setSaveSuccessNotice(null), 3000);
-    }
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {saveSuccessNotice && (
-        <div className="alert alert-success rounded-0 border border-3 border-dark fw-bold text-dark shadow-[4px_4px_0px_0px_black] d-flex align-items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-success" />
+        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-400 text-emerald-300 font-mono text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{saveSuccessNotice}</span>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {teamBios.map((member) => {
           const isEditing = editingId === member.id;
           const isLaxman = member.id === 'bio-laxman';
@@ -177,181 +152,171 @@ export const TeamBiosSection: React.FC<TeamBiosSectionProps> = ({ currentStudent
           return (
             <div
               key={member.id}
-              className={`card rounded-0 border border-4 border-dark p-4 p-md-5 shadow-[6px_6px_0px_0px_black] ${
-                member.isLead ? 'bg-light border-success' : 'bg-white'
+              className={`rounded-2xl border p-6 sm:p-8 transition-all duration-300 ${
+                member.isLead 
+                  ? 'bg-[#090e23]/90 border-cyan-400/30 shadow-[0_0_30px_rgba(94,242,255,0.1)]' 
+                  : 'bg-[#080c1d]/80 border-white/10'
               }`}
             >
               {isEditing && formData ? (
-                <form onSubmit={handleSaveEdit} className="space-y-3">
-                  <div className="d-flex justify-content-between align-items-center border-bottom border-dark pb-2">
-                    <span className="fw-black text-uppercase text-success">Editing {member.name}'s Profile</span>
-                    <button type="button" onClick={handleCancelEdit} className="btn btn-sm btn-outline-dark rounded-0">
+                <form onSubmit={handleSaveEdit} className="space-y-4">
+                  <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                    <span className="font-mono text-xs text-cyan-400 uppercase font-bold">
+                      Editing {member.name}'s Profile
+                    </span>
+                    <button type="button" onClick={handleCancelEdit} className="text-slate-400 hover:text-white">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <div className="row g-2">
-                    <div className="col-md-6">
-                      <label className="form-label fw-bold text-uppercase small">Full Name</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-mono text-slate-400 mb-1">Full Name</label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
-                        className="form-control rounded-0 border-2 border-dark fw-medium"
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-cyan-400"
                       />
                     </div>
-                    <div className="col-md-6">
-                      <label className="form-label fw-bold text-uppercase small">Role / Designation</label>
+                    <div>
+                      <label className="block text-xs font-mono text-slate-400 mb-1">Role / Designation</label>
                       <input
                         type="text"
                         value={formData.role}
                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                         required
-                        className="form-control rounded-0 border-2 border-dark fw-medium"
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-cyan-400"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="form-label fw-bold text-uppercase small">About Me (Personal Background & Passions)</label>
+                    <label className="block text-xs font-mono text-slate-400 mb-1">About Me</label>
                     <textarea
                       rows={2}
                       value={formData.aboutMe}
                       onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })}
-                      className="form-control rounded-0 border-2 border-dark fw-medium"
+                      required
+                      className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
                     />
                   </div>
 
                   <div>
-                    <label className="form-label fw-bold text-uppercase small">Full Bio & Technical Contributions</label>
+                    <label className="block text-xs font-mono text-slate-400 mb-1">Bio & Contributions</label>
                     <textarea
                       rows={3}
                       value={formData.bio}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       required
-                      className="form-control rounded-0 border-2 border-dark fw-medium"
+                      className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
                     />
                   </div>
 
                   <div>
-                    <label className="form-label fw-bold text-uppercase small">Why VerdeTech is Special to Me</label>
+                    <label className="block text-xs font-mono text-slate-400 mb-1">Why VerdeTech is Special</label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       value={formData.whyVerdeTechSpecial}
                       onChange={(e) => setFormData({ ...formData, whyVerdeTechSpecial: e.target.value })}
                       required
-                      className="form-control rounded-0 border-2 border-dark fw-medium"
+                      className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
                     />
                   </div>
 
-                  <div>
-                    <label className="form-label fw-bold text-uppercase small">Avatar Image URL</label>
-                    <input
-                      type="url"
-                      value={formData.avatarUrl || ''}
-                      onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-                      placeholder="https://..."
-                      className="form-control rounded-0 border-2 border-dark fw-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="form-label fw-bold text-uppercase small">LinkedIn Profile URL</label>
-                    <input
-                      type="url"
-                      value={formData.linkedinUrl || ''}
-                      onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
-                      placeholder="https://www.linkedin.com/in/..."
-                      className="form-control rounded-0 border-2 border-dark fw-medium font-monospace"
-                    />
-                  </div>
-
-                  <div className="d-flex justify-content-end gap-2 pt-3 border-top border-dark">
-                    <button type="button" onClick={handleCancelEdit} className="btn btn-outline-dark rounded-0 fw-bold border-2">
+                  <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                    <button type="button" onClick={handleCancelEdit} className="btn-stai-ghost text-xs">
                       Cancel
                     </button>
-                    <button type="submit" className="btn btn-success text-white fw-black text-uppercase rounded-0 border border-3 border-dark px-4 py-2">
+                    <button type="submit" className="btn-stai-cyan text-xs">
                       Save Changes
                     </button>
                   </div>
                 </form>
               ) : (
-                <div className="row g-4 align-items-center">
-                  <div className="col-md-3 text-center">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                  {/* Avatar Column */}
+                  <div className="text-center shrink-0 w-36">
                     {avatarToDisplay ? (
-                      <img
-                        src={avatarToDisplay}
-                        alt={member.name}
-                        className="rounded-0 border border-3 border-dark mx-auto shadow-[4px_4px_0px_0px_black]"
-                        style={{ width: '120px', height: '140px', objectFit: 'cover' }}
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                      />
+                      <div className="w-28 h-32 rounded-2xl overflow-hidden border-2 border-cyan-400/40 p-1 bg-black/40 shadow-[0_0_20px_rgba(94,242,255,0.2)] mx-auto">
+                        <img
+                          src={avatarToDisplay}
+                          alt={member.name}
+                          className="w-full h-full object-cover rounded-xl"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
                     ) : (
-                      <div className="bg-success text-white d-flex align-items-center justify-content-center mx-auto border border-3 border-dark shadow-[4px_4px_0px_0px_black]" style={{ width: '120px', height: '140px' }}>
-                        <User className="w-12 h-12" />
+                      <div className="w-28 h-32 rounded-2xl border border-white/10 bg-slate-900/60 flex items-center justify-center mx-auto text-slate-500">
+                        <User className="w-10 h-10 text-cyan-400/60" />
                       </div>
                     )}
-                    <div className="mt-3">
+
+                    <div className="mt-3 space-y-2">
                       {member.isLead && (
-                        <span className="badge bg-warning text-dark fw-black rounded-0 px-2.5 py-1 border border-dark text-uppercase d-block mb-2">
-                          {member.id === 'bio-laxman' ? 'Project Co-Lead' : 'Project Lead'}
+                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-400/30 text-[10px] font-mono font-bold uppercase tracking-wider">
+                          {member.id === 'bio-laxman' ? 'Co-Lead' : 'Lead'}
                         </span>
                       )}
                       <button
                         onClick={() => handleStartEdit(member)}
-                        className="btn btn-sm btn-outline-dark rounded-0 fw-bold border-2 w-100"
+                        className="btn-stai-ghost text-[11px] py-1 px-3 w-full justify-center flex items-center gap-1"
                       >
-                        <Edit3 className="w-3.5 h-3.5 me-1 inline" /> Edit Info
+                        <Edit3 className="w-3 h-3" />
+                        <span>Edit Bio</span>
                       </button>
                     </div>
                   </div>
 
-                  <div className="col-md-9 space-y-3">
-                    <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                  {/* Info Column */}
+                  <div className="flex-1 space-y-3 text-left">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
                       <div>
-                        <h4 className="fw-black text-uppercase text-dark m-0">{member.name}</h4>
-                        <p className="text-success fw-bold small text-uppercase m-0 mt-1">{member.role}</p>
+                        <h4 className="text-xl sm:text-2xl font-bold font-display text-white">{member.name}</h4>
+                        <p className="text-cyan-400 text-xs font-mono font-medium mt-0.5">{member.role}</p>
                       </div>
 
                       {member.linkedinUrl && (
-                        <div className="d-flex flex-column align-items-md-end gap-1">
-                          <a
-                            href={member.linkedinUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn btn-sm btn-dark text-white fw-black text-uppercase rounded-0 border border-2 border-dark px-3 py-1.5 shadow-[2px_2px_0px_0px_black] d-inline-flex align-items-center gap-1.5"
-                            title="View LinkedIn Profile"
-                          >
-                            <i className="bi bi-linkedin text-warning"></i>
-                            <span>LinkedIn Profile</span>
-                            <ExternalLink className="w-3.5 h-3.5 text-warning" />
-                          </a>
-                          <span className="small font-monospace text-muted fw-bold">500+ Connections on LinkedIn</span>
-                        </div>
+                        <a
+                          href={member.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400 text-xs font-mono text-slate-300 hover:text-white transition-all shrink-0"
+                          title="View LinkedIn Profile"
+                        >
+                          <i className="bi bi-linkedin text-cyan-400"></i>
+                          <span>LinkedIn</span>
+                          <ExternalLink className="w-3 h-3 text-slate-400" />
+                        </a>
                       )}
                     </div>
 
                     {member.aboutMe && (
-                      <div className="p-3 bg-light border border-2 border-dark">
-                        <span className="d-block fw-bold text-uppercase small text-muted mb-1">About Me</span>
-                        <p className="text-dark fw-medium small m-0">{member.aboutMe}</p>
+                      <div className="p-3.5 rounded-xl bg-black/30 border border-white/5">
+                        <span className="block text-[10px] font-mono uppercase text-slate-500 tracking-wider mb-1">
+                          Personal Statement
+                        </span>
+                        <p className="text-slate-300 text-xs leading-relaxed">{member.aboutMe}</p>
                       </div>
                     )}
 
-                    <div>
-                      <span className="d-block fw-bold text-uppercase small text-muted mb-1">Bio & Contributions</span>
-                      <p className="text-dark fw-medium m-0">{member.bio}</p>
+                    <div className="text-xs text-slate-400 leading-relaxed">
+                      <span className="block text-[10px] font-mono uppercase text-slate-500 tracking-wider mb-1">
+                        Key Engineering Contributions
+                      </span>
+                      <p>{member.bio}</p>
                     </div>
 
                     {member.whyVerdeTechSpecial && (
-                      <div className="p-3 bg-success-subtle border border-2 border-dark">
-                        <span className="d-block fw-bold text-uppercase small text-success mb-1 flex items-center gap-1">
-                          <Sparkles className="w-3.5 h-3.5" /> Why VerdeTech is Special
+                      <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/20">
+                        <span className="text-[10px] font-mono uppercase text-emerald-400 tracking-wider mb-1 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-emerald-400" />
+                          <span>Why VerdeTech is Special</span>
                         </span>
-                        <p className="text-dark fw-medium m-0 italic">"{member.whyVerdeTechSpecial}"</p>
+                        <p className="text-slate-300 text-xs italic leading-relaxed">"{member.whyVerdeTechSpecial}"</p>
                       </div>
                     )}
                   </div>

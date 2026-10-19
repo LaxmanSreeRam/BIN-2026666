@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Leaf, Sparkles, X, CheckCircle2, ArrowRight } from 'lucide-react';
+import { playSound } from '../utils/soundFx';
 
 interface WelcomeBannerProps {
   type: 'login' | 'register';
@@ -18,16 +19,18 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
   onDismiss,
 }) => {
   const displayHandle = username || ecoNumber || 'student';
+
   useEffect(() => {
+    playSound('enter');
     try {
       confetti({
         particleCount: 50,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#059669', '#10b981', '#f59e0b', '#3b82f6'],
+        colors: ['#5ef2ff', '#7dff8a', '#ffd166', '#9d7bff'],
       });
     } catch {
-      // Ignore if canvas is not ready
+      // Ignore
     }
 
     const timer = setTimeout(() => {
@@ -44,67 +47,68 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
     <div 
       className="modal show d-block" 
       tabIndex={-1} 
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1065 }}
+      style={{ backgroundColor: 'rgba(6, 9, 19, 0.85)', backdropFilter: 'blur(12px)', zIndex: 1065 }}
     >
       <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '480px' }}>
-        <div className="modal-content border border-4 border-dark rounded-0 shadow-[8px_8px_0px_0px_black] bg-white overflow-hidden text-center">
+        <div className="modal-content rounded-3xl border border-cyan-400/40 shadow-[0_0_50px_rgba(94,242,255,0.25)] bg-[#090e21] overflow-hidden text-center text-white">
           
           {/* Header Strip */}
-          <div className="bg-success text-white p-3 border-bottom border-dark border-3 d-flex align-items-center justify-content-between">
-            <span className="badge bg-warning text-dark border border-dark rounded-0 fw-black text-uppercase px-2.5 py-1 small">
-              ★ {isLogin ? 'Authentication Verified' : 'Account Created'} ★
+          <div className="bg-black/40 px-5 py-3 border-b border-white/10 flex items-center justify-between">
+            <span className="badge bg-cyan-950 text-cyan-300 border border-cyan-400/40 font-mono text-xs uppercase px-2.5 py-1">
+              SYS.AUTH // {isLogin ? 'VERIFIED' : 'PROVISIONED'}
             </span>
             <button
               type="button"
               onClick={onDismiss}
-              className="btn-close btn-close-white rounded-0"
+              className="text-slate-400 hover:text-white transition-colors"
               aria-label="Dismiss"
-            />
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <div className="p-4 p-sm-5">
+          <div className="p-6 sm:p-8">
             {/* Mascot / Icon Badge */}
-            <div className="mx-auto mb-3 p-3 bg-dark text-white rounded-0 border border-3 border-dark d-inline-flex align-items-center justify-content-center shadow-[4px_4px_0px_0px_black]" style={{ width: '64px', height: '64px' }}>
+            <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-violet-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-400 shadow-[0_0_25px_rgba(94,242,255,0.2)]">
               {isLogin ? (
-                <Leaf className="w-8 h-8 text-success" />
+                <Leaf className="w-8 h-8 text-emerald-400" />
               ) : (
-                <Sparkles className="w-8 h-8 text-warning" />
+                <Sparkles className="w-8 h-8 text-cyan-400" />
               )}
             </div>
 
-            <h3 className="fw-black text-dark text-uppercase tracking-tight mb-2">
+            <h3 className="font-extrabold font-display text-white text-xl sm:text-2xl tracking-tight mb-2">
               {headingText}
             </h3>
 
-            <p className="text-dark fw-medium small mb-4">
+            <p className="text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed">
               {isLogin ? (
                 <>
-                  Ready to log your green actions today? Logged in as{' '}
-                  <strong className="badge bg-dark text-warning rounded-0 font-monospace px-2 py-1 fs-6">
+                  Ready to deploy your sustainability innovations? Logged in as{' '}
+                  <strong className="font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-black/50 border border-white/10">
                     @{displayHandle}
                   </strong>
                   .
                 </>
               ) : (
                 <>
-                  Your student profile is all set! Your handle is{' '}
-                  <strong className="badge bg-dark text-warning rounded-0 font-monospace px-2 py-1 fs-6">
+                  Your student identity has been established on the ISWK Future Grid! Your handle is{' '}
+                  <strong className="font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-black/50 border border-white/10">
                     @{displayHandle}
                   </strong>
-                  . Start earning points, connect with classmates, and climb the campus leaderboard!
+                  . Start logging verified actions and earn Verde credits!
                 </>
               )}
             </p>
 
             <button
               onClick={onDismiss}
-              className="btn btn-success text-white w-100 fw-black text-uppercase rounded-0 border border-3 border-dark py-3 fs-6 shadow-[4px_4px_0px_0px_black] d-flex align-items-center justify-content-center gap-2"
+              className="w-full btn-stai-cyan justify-center py-3 text-xs sm:text-sm font-bold uppercase tracking-wider"
             >
-              <span>{isLogin ? "Go to Dashboard" : 'Start My Green Journey'}</span>
-              <ArrowRight className="w-5 h-5" />
+              <span>Enter Workspace</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
             </button>
           </div>
-
         </div>
       </div>
     </div>
