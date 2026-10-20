@@ -6,7 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import nodemailer from 'nodemailer';
 import { initializeApp } from 'firebase/app';
 import { initializeFirestore, setLogLevel, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot, increment } from 'firebase/firestore';
-import firebaseConfig from './firebase-applet-config.json';
+import firebaseConfig from './src/firebase-applet-config.json';
 
 export type MailPurpose = 'support' | 'credentials' | 'verify';
 
