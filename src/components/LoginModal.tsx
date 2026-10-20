@@ -21,8 +21,9 @@ import {
 } from 'lucide-react';
 import { EcoAuthBanner } from './EcoAuthBanner';
 import { getApiUrl, isStaticHost } from '../utils/apiConfig';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -303,19 +304,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setErrorMsg('');
 
     try {
-      await fetch(getApiUrl('/api/verify-code'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailInput.trim().toLowerCase(),
-          code: verificationCode.trim(),
-          studentName: nameInput.trim(),
-          username: cleanUser,
-          password: passwordInput,
-        }),
-      });
-    } catch (e) {
-      console.warn('Backend verification call warning:', e);
+      // 1. Create User in Firebase Auth
+      await createUserWithEmailAndPassword(auth, emailInput.trim().toLowerCase(), passwordInput);
+      console.log('Firebase user created successfully');
+    } catch (e: any) {
+      console.error('Firebase Auth error:', e);
+      setErrorMsg(e.message || 'Failed to create authentication account.');
+      setIsLoading(false);
+      return;
     }
 
     const internalId = Math.floor(10000 + Math.random() * 90000).toString();
@@ -633,11 +629,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       <p className="text-[11px] text-amber-200/90 leading-relaxed">
                         This site is hosted on GitHub Pages (static file host without Node.js backend). Your verification code is synchronized directly via Firestore:
                       </p>
-                      {expectedCode && (
-                        <div className="flex justify-center p-2.5 bg-black/60 rounded-lg border border-amber-400/30">
-                          <span className="font-mono text-xl font-black tracking-widest text-amber-300">
+                      {expectedCode ? (
+                        <div className="flex flex-col items-center justify-center p-4 bg-black/80 rounded-xl border-2 border-amber-400/50 shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+                          <span className="text-[10px] uppercase tracking-widest text-amber-500 font-bold mb-2">
+                            YOUR VERIFICATION CODE
+                          </span>
+                          <span className="font-mono text-5xl font-black tracking-[0.5em] text-white">
                             {expectedCode}
                           </span>
+                        </div>
+                      ) : (
+                        <div className="text-center p-3 text-amber-300 font-mono text-sm animate-pulse">
+                          Fetching code...
                         </div>
                       )}
                     </div>
