@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { initializeFirestore, setLogLevel, doc, getDocFromServer } from 'firebase/firestore';
-import localConfig from '../../firebase-applet-config.json';
+import localConfig from '../firebase-applet-config.json';
 
 // Silence benign internal gRPC stream reconnection notices from Firestore
 setLogLevel('silent');
