@@ -49,7 +49,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [usernameInput, setUsernameInput] = useState('');
   const [followPrivacyInput, setFollowPrivacyInput] = useState<'direct' | 'request' | 'private'>('direct');
   const [deliveryError, setDeliveryError] = useState('');
-  const [devCodeHint, setDevCodeHint] = useState('');
   const [isResending, setIsResending] = useState(false);
   const [resendNotice, setResendNotice] = useState('');
 
@@ -100,8 +99,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       });
       const data = await response.json();
       if (data.success) {
-        setVerificationCode('');
-        if (data.code) setDevCodeHint(data.code);
         setDeliveryError('');
       } else {
         setDeliveryError('');
@@ -130,9 +127,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       });
       const data = await response.json();
       if (data.success) {
-        if (data.code) setDevCodeHint(data.code);
         setDeliveryError('');
-        setResendNotice(`Fresh verification code generated! ${data.code ? `(Code: ${data.code})` : ''}`);
+        setResendNotice('Fresh verification code securely sent to your email inbox!');
       } else {
         setResendNotice(data.error || 'Unable to resend code at this time.');
       }
@@ -513,24 +509,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               ) : step === 'verify' ? (
                 /* Step 2: Verification Code Entry */
                 <div className="space-y-4">
-                  {devCodeHint && (
-                    <div className="p-4 rounded-xl bg-cyan-950/80 border border-cyan-400/60 text-cyan-200 text-xs flex items-center justify-between shadow-[0_0_25px_rgba(94,242,255,0.3)] animate-pulse">
-                      <div>
-                        <span className="font-bold text-cyan-300 block mb-1 uppercase tracking-wider">🔑 Instant Verification Code:</span>
-                        <span className="font-mono text-2xl font-black tracking-widest text-white">{devCodeHint}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setVerificationCode(devCodeHint)}
-                        className="px-3.5 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold font-mono text-xs transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_#5ef2ff]"
-                      >
-                        Auto-Fill
-                      </button>
-                    </div>
-                  )}
-
                   <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-200 text-xs">
-                    Confirmation code generated for <strong>{emailInput}</strong>.
+                    Confirmation code securely dispatched to <strong>{emailInput}</strong>. Please check your email inbox.
                     {deliveryError && (
                       <div className="mt-2 text-xs text-amber-300">
                         <strong>Notice:</strong> {deliveryError}
