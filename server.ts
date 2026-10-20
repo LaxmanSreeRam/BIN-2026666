@@ -105,9 +105,9 @@ async function sendEmailSafely(
           user: config.user,
           pass: config.pass,
         },
-        connectionTimeout: 8000,
-        greetingTimeout: 8000,
-        socketTimeout: 10000,
+        connectionTimeout: 4000,
+        greetingTimeout: 4000,
+        socketTimeout: 6000,
       });
 
       try {
@@ -125,9 +125,9 @@ async function sendEmailSafely(
             user: config.user,
             pass: config.pass,
           },
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 10000,
+          connectionTimeout: 4000,
+          greetingTimeout: 4000,
+          socketTimeout: 6000,
         });
 
         const info = await transporter.sendMail(optionsWithSender);
@@ -447,6 +447,17 @@ async function findStudentByEcoNumber(rawNumber: string) {
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Global CORS middleware for all domains (verdetech.systems), iframes, hardware
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
 
   app.use(express.json({ limit: '20mb' }));
   app.use(express.urlencoded({ extended: true, limit: '20mb' }));

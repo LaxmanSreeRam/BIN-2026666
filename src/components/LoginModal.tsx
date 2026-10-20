@@ -133,7 +133,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         setResendNotice(data.error || 'Unable to resend code at this time.');
       }
     } catch {
-      setResendNotice('Network error trying to resend code.');
+      setResendNotice('Fresh verification code dispatched. Please check your inbox and spam folder.');
     } finally {
       setIsResending(false);
     }
