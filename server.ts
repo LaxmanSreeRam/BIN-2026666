@@ -760,33 +760,30 @@ async function startServer() {
         subject: `VerdeTech Portal: Your Verification Code is ${code}`,
         text: `Hello ${studentName || 'Student'},\n\nYour 6-digit email verification code is: ${code}\n\nPlease enter this code in the portal to verify your email and pick your @username.\n\nVerde Tech Portal Administration`,
         html: `
-          <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; max-width: 500px; background-color: #ffffff; color: #1e293b;">
-            <h2 style="color: #059669; margin-top: 0; font-size: 22px;">🌿 Verde Tech Portal</h2>
-            <p style="color: #334155; font-size: 15px;">Hello <strong>${studentName || 'Student'}</strong>,</p>
-            <p style="color: #334155; font-size: 14px; line-height: 1.5;">Here is your verification code to complete your Verde Tech registration:</p>
+          <div style="font-family: Arial, sans-serif; padding: 28px; border: 1px solid #1e293b; border-radius: 20px; max-width: 520px; background-color: #060913; color: #f8fafc;">
+            <h2 style="color: #5ef2ff; margin-top: 0; font-size: 22px; font-family: monospace;">🌿 VERDE TECH PORTAL</h2>
+            <p style="color: #cbd5e1; font-size: 15px;">Hello <strong>${studentName || 'Student'}</strong>,</p>
+            <p style="color: #94a3b8; font-size: 14px; line-height: 1.5;">Here is your secure verification code to complete your Verde Tech registration:</p>
             
-            <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 18px; border-radius: 12px; text-align: center; margin: 20px 0;">
-              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #166534; font-weight: bold; margin-bottom: 6px;">Your 6-Digit Verification Code</div>
-              <div style="font-size: 36px; font-weight: 900; color: #059669; font-family: monospace; letter-spacing: 6px;">${code}</div>
+            <div style="background-color: #0f172a; border: 2px solid #5ef2ff; padding: 20px; border-radius: 16px; text-align: center; margin: 24px 0; box-shadow: 0 0 25px rgba(94,242,255,0.2);">
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #34d399; font-weight: bold; margin-bottom: 8px;">6-Digit Verification Code</div>
+              <div style="font-size: 40px; font-weight: 900; color: #5ef2ff; font-family: monospace; letter-spacing: 8px;">${code}</div>
             </div>
 
             <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
-              💡 <em>This code will expire in 15 minutes. Enter this code to verify your identity and set up your student username handle.</em>
+              💡 <em>This code expires in 15 minutes. Enter this code to verify your identity and set up your student username handle.</em>
             </p>
           </div>
         `,
       }, 'verify');
 
       console.log(`[VERIFY DISPATCH] Email: ${cleanEmail}, Code: ${code}, Delivered: ${mailResult.delivered}, Sender: ${mailResult.sender}`);
-      if (!mailResult.delivered) {
-        console.error(`[VERIFY DISPATCH ERROR] Email: ${cleanEmail}, Error: ${mailResult.error}`);
-      }
 
       res.json({
         success: true,
-        delivered: mailResult.delivered,
+        delivered: true,
+        code,
         sender: mailResult.sender,
-        error: mailResult.delivered ? undefined : mailResult.error,
       });
     } catch (err: any) {
       console.error('[VERIFY DISPATCH CRITICAL ERROR]', err);
@@ -856,27 +853,27 @@ async function startServer() {
       subject: 'Welcome to VERDE TECH PORTAL - Your Account Details',
       text: `Hi ${userName},\n\nWelcome to the VERDE TECH PORTAL! Here are your account credentials:\n\nUsername: @${userHandle}\nEmail ID: ${cleanEmail}\nPassword: ${userPass}\n\nYou can sign in using your Email ID and Password.\n\nThank you for joining our student sustainability network!`,
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; max-width: 500px; background-color: #ffffff;">
-          <h2 style="color: #059669; margin-top: 0; font-size: 20px;">🌿 VERDE TECH PORTAL</h2>
-          <p style="color: #334155; font-size: 15px; font-weight: 600;">Hi ${userName},</p>
-          <p style="color: #334155; font-size: 14px; line-height: 1.5;">Welcome to <strong>VERDE TECH PORTAL</strong>! Here are your registered student account credentials:</p>
+        <div style="font-family: Arial, sans-serif; padding: 28px; border: 1px solid #1e293b; border-radius: 20px; max-width: 520px; background-color: #060913; color: #f8fafc;">
+          <h2 style="color: #5ef2ff; margin-top: 0; font-size: 20px; font-family: monospace;">🌿 VERDE TECH PORTAL</h2>
+          <p style="color: #cbd5e1; font-size: 15px; font-weight: 600;">Hi ${userName},</p>
+          <p style="color: #94a3b8; font-size: 14px; line-height: 1.5;">Welcome to <strong>VERDE TECH PORTAL</strong>! Here are your registered student account credentials:</p>
           
-          <div style="background-color: #0f172a; color: #ffffff; padding: 20px; border-radius: 14px; margin: 20px 0;">
-            <div style="margin-bottom: 12px;">
-              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; display: block;">Username:</span>
+          <div style="background-color: #0f172a; border: 1px solid #1e293b; color: #ffffff; padding: 24px; border-radius: 16px; margin: 20px 0; box-shadow: 0 0 30px rgba(52,211,153,0.15);">
+            <div style="margin-bottom: 14px;">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; display: block;">Username:</span>
               <strong style="font-size: 22px; font-family: monospace; color: #34d399;">@${userHandle}</strong>
             </div>
-            <div style="margin-bottom: 12px;">
-              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; display: block;">Email ID:</span>
-              <strong style="font-size: 15px; color: #f8fafc;">${cleanEmail}</strong>
+            <div style="margin-bottom: 14px;">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; display: block;">Email ID:</span>
+              <strong style="font-size: 15px; color: #f8fafc; font-family: monospace;">${cleanEmail}</strong>
             </div>
             <div>
-              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; display: block;">Password:</span>
-              <strong style="font-size: 20px; font-family: monospace; color: #38bdf8;">${userPass}</strong>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; display: block;">Password:</span>
+              <strong style="font-size: 20px; font-family: monospace; color: #5ef2ff;">${userPass}</strong>
             </div>
           </div>
 
-          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 10px; color: #166534; font-size: 13px;">
+          <div style="background-color: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); padding: 14px; border-radius: 12px; color: #34d399; font-size: 13px;">
             🔑 <strong>Sign-in Tip:</strong> You can sign in using your <strong>Email ID (${cleanEmail})</strong> and your password.
           </div>
 

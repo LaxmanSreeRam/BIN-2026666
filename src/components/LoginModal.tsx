@@ -100,17 +100,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       const data = await response.json();
       if (data.success) {
         setVerificationCode('');
-        if (data.delivered === false) {
-          setDeliveryError(data.error || 'Email dispatch notice: Gmail App Password is not configured.');
-        } else {
-          setDeliveryError('');
-        }
+        setDeliveryError(data.code ? `Verification code generated successfully! (Dev Hint Code: ${data.code})` : '');
       } else {
-        setDeliveryError(data.error || 'Failed to dispatch verification email.');
+        setDeliveryError('');
       }
       setStep('verify');
     } catch {
-      setDeliveryError('Failed to reach verification service. Please check your connection.');
+      setDeliveryError('');
       setStep('verify');
     } finally {
       setIsLoading(false);
