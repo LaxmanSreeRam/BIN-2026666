@@ -50,7 +50,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [step, setStep] = useState<'form' | 'verify' | 'username'>('form');
   const [verificationCode, setVerificationCode] = useState('');
   const [expectedCode, setExpectedCode] = useState('');
-  const [isStaticFallback, setIsStaticFallback] = useState(false);
+  const [isStaticFallback] = useState(isStaticHost());
+
+  // Reliable code fetch for static host
+  useEffect(() => {
+    if (step === 'verify' && isStaticFallback && db) {
+      const fetchCode = async () => {
+        try {
+          const snap = await getDoc(doc(db, 'pending_verifications', emailInput.trim().toLowerCase()));
+          if (snap.exists()) {
+            setExpectedCode(snap.data()?.code || '');
+          }
+        } catch (err) {
+          console.error('Failed to fetch code from Firestore:', err);
+        }
+      };
+      fetchCode();
+    }
+  }, [step, isStaticFallback, emailInput]);
+
   const [usernameInput, setUsernameInput] = useState('');
   const [followPrivacyInput, setFollowPrivacyInput] = useState<'direct' | 'request' | 'private'>('direct');
   const [deliveryError, setDeliveryError] = useState('');
@@ -93,6 +111,29 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setResendNotice('');
     setIsLoading(true);
 
+    if (isStaticHost()) {
+      console.log('Static host detected, skipping API call.');
+      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      setExpectedCode(generatedCode);
+      if (db) {
+        try {
+          await setDoc(doc(db, 'pending_verifications', trimmedEmail), {
+            email: trimmedEmail,
+            code: generatedCode,
+            studentName: nameInput.trim(),
+            expiresAt: Date.now() + 15 * 60 * 1000,
+            isStaticMode: true,
+            createdAt: Date.now(),
+          });
+        } catch (dbErr) {
+          console.warn('Firestore fallback record error:', dbErr);
+        }
+      }
+      setStep('verify');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const apiUrl = getApiUrl('/api/send-verification');
       const response = await fetch(apiUrl, {
@@ -114,34 +155,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             setDeliveryError('');
             setResendNotice(`Verification code sent to ${trimmedEmail}!`);
           }
-          setIsStaticFallback(false);
           setStep('verify');
           return;
         }
       }
       throw new Error(`Endpoint returned status ${response.status}`);
     } catch (fetchErr) {
-      console.warn('API verification endpoint unreachable, activating direct Firestore verification:', fetchErr);
-      // Static host fallback (e.g. GitHub Pages / verdetech.systems where server.ts does not run)
-      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-      setExpectedCode(generatedCode);
-      setIsStaticFallback(true);
-
-      if (db) {
-        try {
-          await setDoc(doc(db, 'pending_verifications', trimmedEmail), {
-            email: trimmedEmail,
-            code: generatedCode,
-            studentName: nameInput.trim(),
-            expiresAt: Date.now() + 15 * 60 * 1000,
-            isStaticMode: true,
-            createdAt: Date.now(),
-          });
-        } catch (dbErr) {
-          console.warn('Firestore fallback record error:', dbErr);
-        }
-      }
-      setStep('verify');
+      console.warn('API verification endpoint unreachable:', fetchErr);
+      setErrorMsg('Verification service temporarily unreachable. Please try again or use the offline verification method if available.');
+      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
