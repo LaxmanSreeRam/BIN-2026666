@@ -323,15 +323,23 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setIsLoading(true);
     setErrorMsg('');
 
+    setIsLoading(true);
+    setErrorMsg('');
+
     try {
-      // 1. Create User in Firebase Auth
-      await createUserWithEmailAndPassword(auth, emailInput.trim().toLowerCase(), passwordInput);
-      console.log('Firebase user created successfully');
+      // If no password provided (e.g. Google Login), skip auth creation as it's already done
+      if (passwordInput && passwordInput.length > 0) {
+        await createUserWithEmailAndPassword(auth, emailInput.trim().toLowerCase(), passwordInput);
+        console.log('Firebase user created successfully');
+      }
     } catch (e: any) {
-      console.error('Firebase Auth error:', e);
-      setErrorMsg(e.message || 'Failed to create authentication account.');
-      setIsLoading(false);
-      return;
+      // Ignore if user already exists (auth/email-already-in-use) or missing password
+      if (e.code !== 'auth/email-already-in-use' && e.code !== 'auth/missing-password') {
+        console.error('Firebase Auth error:', e);
+        setErrorMsg(e.message || 'Failed to create authentication account.');
+        setIsLoading(false);
+        return;
+      }
     }
 
     const internalId = Math.floor(10000 + Math.random() * 90000).toString();
