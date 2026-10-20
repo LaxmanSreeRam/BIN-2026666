@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Student } from '../types';
 import { Mail, KeyRound, X, CheckCircle2, AlertCircle, Send, ArrowRight, Loader2 } from 'lucide-react';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface RequestCredentialsModalProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ export const RequestCredentialsModal: React.FC<RequestCredentialsModalProps> = (
 
       // 2. Dispatch credentials via server
       try {
-        const response = await fetch('/api/request-credentials', {
+        const response = await fetch(getApiUrl('/api/request-credentials'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

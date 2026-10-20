@@ -17,6 +17,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface LogActivityModalProps {
   isOpen: boolean;
@@ -97,7 +98,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
     const finalNote = proofNote.trim() || `Waste disposal at ${smartBinId} (${quantity} item/s)`;
 
     try {
-      await fetch('/api/smart-bin-disposal', {
+      await fetch(getApiUrl('/api/smart-bin-disposal'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

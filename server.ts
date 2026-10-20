@@ -21,8 +21,8 @@ function getMailAccountConfig(purpose: MailPurpose): MailAccountConfig {
 
   switch (purpose) {
     case 'verify': {
-      const user = (process.env.SUPPORT_GMAIL_USER || 'verdetech001@gmail.com').trim();
-      const pass = (process.env.SUPPORT_GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '').trim();
+      const user = (process.env.VERIFY_GMAIL_USER || 'verifyverdetechsystems@gmail.com').trim();
+      const pass = (process.env.VERIFY_GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD || process.env.SUPPORT_GMAIL_APP_PASSWORD || '').replace(/\s+/g, '').trim();
       return {
         user,
         pass,
@@ -142,11 +142,12 @@ async function sendEmailSafely(
     }
   }
 
-  console.warn(`[MAIL FALLBACK] All candidate senders failed for ${mailOptions.to} (${lastError}). Simulating successful dispatch for uninterrupted user experience.`);
+  console.warn(`[MAIL FAILOVER] All candidate senders failed for ${mailOptions.to} (${lastError}).`);
   return {
     success: true,
-    delivered: true,
+    delivered: false,
     sender: primary.user,
+    error: lastError || 'All email senders failed to dispatch message.',
   };
 }
 
@@ -798,9 +799,10 @@ async function startServer() {
 
       res.json({
         success: true,
-        delivered: true,
+        delivered: mailResult.delivered,
         code,
         sender: mailResult.sender,
+        error: mailResult.error,
       });
     } catch (err: any) {
       console.error('[VERIFY DISPATCH CRITICAL ERROR]', err);

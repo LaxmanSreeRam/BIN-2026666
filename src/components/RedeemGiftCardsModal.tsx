@@ -15,6 +15,7 @@ import {
 import confetti from 'canvas-confetti';
 import { db } from '../lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getApiUrl } from '../utils/apiConfig';
 
 export interface RecentRedemption {
   id: string;
@@ -191,7 +192,7 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
       let apiData: any = null;
 
       try {
-        const res = await fetch('/api/verify-gift-code', {
+        const res = await fetch(getApiUrl('/api/verify-gift-code'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: clean }),

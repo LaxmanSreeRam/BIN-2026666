@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Calculator, Trees, Droplets, Zap, Sparkles, TrendingUp, Shield, ArrowRight, Cpu, CheckCircle2, XCircle, Copy, Check, Terminal } from 'lucide-react';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface EcoCalculatorProps {
   onOpenLogModal: () => void;
@@ -18,7 +19,7 @@ export const EcoCalculator: React.FC<EcoCalculatorProps> = ({ onOpenLogModal }) 
   const handleTestApi = async () => {
     setApiLoading(true);
     try {
-      const res = await fetch(`/econumberExists?n=${encodeURIComponent(testEcoNum.trim())}`);
+      const res = await fetch(getApiUrl(`/econumberExists?n=${encodeURIComponent(testEcoNum.trim())}`));
       const data = await res.json();
       setApiResult(data);
     } catch (err: any) {

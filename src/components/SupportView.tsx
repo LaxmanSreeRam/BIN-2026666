@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Student } from '../types';
 import { saveIssueToFirestore } from '../lib/firebaseSync';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface SupportViewProps {
   currentStudent: Student | null;
@@ -123,7 +124,7 @@ export const SupportView: React.FC<SupportViewProps> = ({
     const timestamp = new Date().toISOString();
 
     try {
-      await fetch('/api/report-issue', {
+      await fetch(getApiUrl('/api/report-issue'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

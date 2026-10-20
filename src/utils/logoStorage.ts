@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import defaultLogo from '../assets/images/verdetech_official_logo.jpg';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { getApiUrl } from './apiConfig';
 
 export function getInitialLogo(): string {
   if (typeof window !== 'undefined') {
@@ -73,7 +74,7 @@ export function usePortalLogo(): [
           localStorage.setItem('verdetech_logo_locked', 'true');
 
           // 3. Send to Server to save on disk
-          fetch('/api/upload-logo', {
+          fetch(getApiUrl('/api/upload-logo'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ dataUrl, isLocked: true })

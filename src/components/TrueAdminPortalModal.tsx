@@ -17,6 +17,7 @@ import {
 import { ActivityLog, Student } from '../types';
 import { saveStudentToFirestore } from '../lib/firebaseSync';
 import { playSound } from '../utils/soundFx';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface TrueAdminPortalModalProps {
   isOpen: boolean;
@@ -87,7 +88,7 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
     setLoading(true);
     try {
       const targetEmail = matchedAdmin.email;
-      const res = await fetch('/api/send-verification', {
+      const res = await fetch(getApiUrl('/api/send-verification'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -163,7 +164,7 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
       const matchedAdmin = AUTHORIZED_ADMINS.find((a) => a.staffId === staffId.trim());
       const targetEmail = matchedAdmin ? matchedAdmin.email : email.trim().toLowerCase();
 
-      const res = await fetch('/api/verify-code', {
+      const res = await fetch(getApiUrl('/api/verify-code'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -18,6 +18,7 @@ import {
   MessageSquareText,
   MessageCircle
 } from 'lucide-react';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface SupportChatWidgetProps {
   onOpenReportIssue?: () => void;
@@ -81,7 +82,7 @@ export const SupportChatWidget: React.FC<SupportChatWidgetProps> = ({ onOpenRepo
         text: m.text,
       }));
 
-      const res = await fetch('/api/support-chat', {
+      const res = await fetch(getApiUrl('/api/support-chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
