@@ -609,20 +609,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                         <span>Static Host Active (verdetech.systems)</span>
                       </div>
                       <p className="text-[11px] text-amber-200/90 leading-relaxed">
-                        This site is hosted on GitHub Pages (static file host without Node.js backend). Your verification code is synchronized directly via Firestore:
+                        This site is hosted on GitHub Pages (static file host without Node.js backend). Your verification code is synchronized directly via Firestore. Please enter it manually below:
                       </p>
-                      <div className="flex items-center justify-between p-2.5 bg-black/60 rounded-lg border border-amber-400/30">
-                        <span className="font-mono text-xl font-black tracking-widest text-amber-300">
-                          {expectedCode}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setVerificationCode(expectedCode)}
-                          className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded font-mono text-xs font-semibold border border-amber-400/40 transition-colors"
-                        >
-                          Auto-Fill Code
-                        </button>
-                      </div>
                     </div>
                   ) : (
                     <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-400/40 text-cyan-200 text-xs space-y-1">
@@ -633,18 +621,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       <p className="text-[11px] text-slate-300">
                         Dispatched from <em>verifyverdetechsystems@gmail.com</em>. Please check your <strong>Inbox</strong>, <strong>Spam / Junk</strong>, or <strong>Promotions</strong> tab.
                       </p>
-                      {expectedCode && (
-                        <div className="mt-2 pt-2 border-t border-cyan-400/20 flex items-center justify-between">
-                          <span className="text-[11px] text-cyan-300/80">Code received?</span>
-                          <button
-                            type="button"
-                            onClick={() => setVerificationCode(expectedCode)}
-                            className="text-[11px] text-cyan-300 hover:text-cyan-100 underline font-mono"
-                          >
-                            Paste code ({expectedCode})
-                          </button>
-                        </div>
-                      )}
                       {deliveryError && (
                         <div className="mt-2 text-xs text-amber-300">
                           <strong>Notice:</strong> {deliveryError}
