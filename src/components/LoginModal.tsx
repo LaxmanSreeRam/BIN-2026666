@@ -509,15 +509,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               ) : step === 'verify' ? (
                 /* Step 2: Verification Code Entry */
                 <div className="space-y-4">
-                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-200 text-xs">
-                    Confirmation code securely dispatched to <strong>{emailInput}</strong>. Please check your email inbox.
+                  <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-400/40 text-cyan-200 text-xs space-y-1">
+                    <p className="font-semibold text-white">
+                      ✉️ Verification code sent to <strong>{emailInput}</strong>
+                    </p>
+                    <p className="text-[11px] text-slate-300">
+                      Dispatched from <em>verdetech001@gmail.com</em>. If you do not see it in your primary inbox, please check your <strong>Spam / Junk</strong> or <strong>Promotions</strong> folder.
+                    </p>
                     {deliveryError && (
                       <div className="mt-2 text-xs text-amber-300">
                         <strong>Notice:</strong> {deliveryError}
                       </div>
                     )}
                     {resendNotice && (
-                      <div className="mt-2 text-xs text-emerald-300">
+                      <div className="mt-2 text-xs text-emerald-300 font-semibold">
                         {resendNotice}
                       </div>
                     )}

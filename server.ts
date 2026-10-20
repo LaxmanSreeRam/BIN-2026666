@@ -21,12 +21,12 @@ function getMailAccountConfig(purpose: MailPurpose): MailAccountConfig {
 
   switch (purpose) {
     case 'verify': {
-      const user = (process.env.VERIFY_GMAIL_USER || 'verifyverdetechsystems@gmail.com').trim();
-      const pass = (process.env.VERIFY_GMAIL_APP_PASSWORD || '').replace(/\s+/g, '').trim() || globalFallbackPass;
+      const user = (process.env.SUPPORT_GMAIL_USER || 'verdetech001@gmail.com').trim();
+      const pass = (process.env.SUPPORT_GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '').trim();
       return {
         user,
         pass,
-        senderName: 'VerdeTech Verification',
+        senderName: 'VerdeTech Official',
       };
     }
     case 'credentials': {
@@ -89,8 +89,7 @@ async function sendEmailSafely(
       from: `"${config.senderName}" <${config.user}>`,
       replyTo: config.user,
       headers: {
-        'X-Priority': '1',
-        'Importance': 'High',
+        'X-Mailer': 'VerdeTech Notification System',
         ...(mailOptions.headers || {}),
       },
     };
@@ -775,8 +774,8 @@ async function startServer() {
 
       const mailResult = await sendEmailSafely({
         to: cleanEmail,
-        subject: `VerdeTech Portal: Your Verification Code is ${code}`,
-        text: `Hello ${studentName || 'Student'},\n\nYour 6-digit email verification code is: ${code}\n\nPlease enter this code in the portal to verify your email and pick your @username.\n\nVerde Tech Portal Administration`,
+        subject: `Your VerdeTech Verification Code: ${code}`,
+        text: `Hello ${studentName || 'Student'},\n\nYour 6-digit VerdeTech verification code is: ${code}\n\nPlease enter this code in the portal to verify your email address.\n\nBest regards,\nVerdeTech Portal Administration`,
         html: `
           <div style="font-family: Arial, sans-serif; padding: 28px; border: 1px solid #1e293b; border-radius: 20px; max-width: 520px; background-color: #060913; color: #f8fafc;">
             <h2 style="color: #5ef2ff; margin-top: 0; font-size: 22px; font-family: monospace;">🌿 VERDE TECH PORTAL</h2>
