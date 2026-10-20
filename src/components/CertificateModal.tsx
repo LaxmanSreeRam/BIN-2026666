@@ -71,7 +71,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
       const targetName = activeStudent?.name || 'Student Name';
       const grNo = activeStudent?.grNo || '000000';
       const userHandle = activeStudent?.username || activeStudent?.name?.toLowerCase().replace(/[^a-z0-9]/g, '_') || grNo;
-      const role = activeStudent?.role || 'Campus Eco Member';
+      const role = activeStudent?.role || 'Eco Member';
 
       // Center of usable text field (template has decorative border on left 25%)
       const textCenterX = isFallback ? canvas.width * 0.5 : canvas.width * 0.62;

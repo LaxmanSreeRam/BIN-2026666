@@ -37,7 +37,7 @@ export const AdminGiftCodesDashboard: React.FC = () => {
 
   return (
     <div className="p-4 bg-light">
-      <h2 className="fw-black text-uppercase">Admin Gift Codes</h2>
+      <h2 className="fw-black text-uppercase">Admin Redeem Codes</h2>
       <button onClick={generateCode} className="btn btn-primary my-3">
         <PlusCircle className="me-2" /> Generate Random 4-Digit Code
       </button>

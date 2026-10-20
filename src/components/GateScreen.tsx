@@ -18,7 +18,7 @@ export const GateScreen: React.FC<GateScreenProps> = ({
   const [bootProgress, setBootProgress] = useState<number>(0);
   const [bootLogs, setBootLogs] = useState<string[]>([]);
 
-  // Muscat / Oman time sync
+  // Local time sync
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -47,10 +47,10 @@ export const GateScreen: React.FC<GateScreenProps> = ({
 
     const logs = [
       '[SYS.INIT] Engaging Verde Tech Neural Engine...',
-      '[TELEMETRY] Connecting to ISWK Campus Sensors (23.59° N, 58.54° E)...',
-      '[WORLDS] Mapping 6 Future Sectors: AI, Bio, Climate, Energy, Cities, Space...',
-      '[SECURITY] Verifying Student Eco Credentials & Database...',
-      '[ONLINE] System Active. Welcome to Future World 2026.'
+      '[TELEMETRY] Connecting to Verde Tech Sensor Network...',
+      '[SECTORS] Mapping Eco Sectors: Waste, Energy, Recycling, Community...',
+      '[SECURITY] Verifying Member Eco Credentials & Database...',
+      '[ONLINE] System Active. Welcome to Verde Tech 2026.'
     ];
 
     let currentStep = 0;
@@ -102,14 +102,15 @@ export const GateScreen: React.FC<GateScreenProps> = ({
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-violet-600/15 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none" />
 
+
       {/* Top HUD Bar */}
       <div className="relative z-10 flex items-center justify-between text-xs font-mono tracking-wider">
         <div className="flex items-center gap-3">
-          <span className="text-cyan-400 font-bold">STAI</span>
+          <span className="text-cyan-400 font-bold">VERDE TECH</span>
           <span className="text-slate-600">//</span>
           <span className="text-white font-semibold">2026</span>
           <span className="text-slate-600 hidden sm:inline">|</span>
-          <span className="text-slate-400 hidden sm:inline">VERDE TECH PORTAL</span>
+          <span className="text-slate-400 hidden sm:inline">SUSTAINABILITY TELEMETRY</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -147,13 +148,13 @@ export const GateScreen: React.FC<GateScreenProps> = ({
               <span className="text-cyan-500">•</span>
               <span>Technology</span>
               <span className="text-slate-500">•</span>
-              <span>Innovation</span>
+              <span>Sustainability</span>
             </div>
 
-            {/* Giant Future World Headline */}
+            {/* Giant Verde Tech Headline */}
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black font-display tracking-tight leading-none">
               <span className="block text-white drop-shadow-[0_0_35px_rgba(94,242,255,0.45)]">
-                FUTURE
+                VERDE
               </span>
               <span 
                 className="block text-transparent"
@@ -162,15 +163,15 @@ export const GateScreen: React.FC<GateScreenProps> = ({
                   textShadow: '0 0 30px rgba(94, 242, 255, 0.4)'
                 }}
               >
-                WORLD
+                TECH
               </span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg sm:text-2xl text-slate-300 font-light max-w-xl mx-auto leading-relaxed">
-              The future isn't something we wait for.<br />
+              Sustainability telemetry & verified ecological impact.<br />
               <em className="text-cyan-300 font-normal not-italic drop-shadow-[0_0_12px_rgba(94,242,255,0.3)]">
-                It's something we create.
+                Where environmental action becomes tangible reality.
               </em>
             </p>
 
@@ -180,7 +181,7 @@ export const GateScreen: React.FC<GateScreenProps> = ({
                 onClick={startBootSequence}
                 className="group relative inline-flex items-center gap-3 px-8 sm:px-12 py-4 rounded-full bg-gradient-to-r from-cyan-400 via-teal-300 to-violet-400 text-slate-950 font-display font-extrabold text-base sm:text-lg tracking-wider uppercase shadow-[0_0_35px_rgba(94,242,255,0.5)] hover:shadow-[0_0_60px_rgba(94,242,255,0.8)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
-                <span>Enter the Future</span>
+                <span>Enter Portal</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -225,7 +226,7 @@ export const GateScreen: React.FC<GateScreenProps> = ({
 
             <div className="pt-2 flex items-center justify-between">
               <span className="text-[11px] font-mono text-slate-500">
-                VERDE TECH KERNEL v2.6.0 · ISWK MUSCAT
+                VERDE TECH KERNEL v2.6.0 · SUSTAINABILITY TELEMETRY
               </span>
               <button
                 onClick={onEnter}
@@ -241,10 +242,14 @@ export const GateScreen: React.FC<GateScreenProps> = ({
       {/* Bottom HUD Bar */}
       <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
         <div className="flex items-center gap-2">
-          <span className="text-cyan-400">23.59° N</span>
+          <span className="text-cyan-400">SYS.NODE</span>
           <span className="text-slate-600">//</span>
-          <span className="text-cyan-400">58.54° E</span>
-          <span className="text-slate-500 hidden sm:inline">(Muscat, Oman)</span>
+          <span className="text-emerald-400 font-bold">ONLINE</span>
+        </div>
+
+        <div className="hidden sm:flex items-center gap-2 text-slate-500">
+          <span className="text-cyan-400">LAT/LON</span>
+          <span className="text-slate-300 tabular-nums">23.59° N · 58.54° E</span>
         </div>
 
         <div className="flex items-center gap-3">

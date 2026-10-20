@@ -55,7 +55,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   // Registration success state
   const [registeredStudent, setRegisteredStudent] = useState<Student | null>(null);
   const [copied, setCopied] = useState(false);
-  const [logoSrc] = usePortalLogo();
 
   if (!isOpen) return null;
 
@@ -67,7 +66,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       return;
     }
     if (!emailInput.trim()) {
-      setErrorMsg('Please enter your email ID');
+      setErrorMsg('Please enter your email address');
       return;
     }
     if (!passwordInput.trim()) {
@@ -135,7 +134,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       if (data.success) {
         if (data.delivered === false) {
           setDeliveryError(data.error || 'Email could not be delivered.');
-          setResendNotice('Delivery notice: ' + (data.error || 'Gmail credentials not configured.'));
+          setResendNotice('Delivery notice: ' + (data.error || 'Credentials not configured.'));
         } else {
           setDeliveryError('');
           setResendNotice('Fresh 6-digit verification code sent to your email inbox!');
@@ -160,7 +159,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setErrorMsg('');
 
     try {
-      // Propose an initial username handle based on student's name
+      // Propose an initial username handle based on member's name
       const cleanSuggestion = nameInput
         .toLowerCase()
         .replace(/[^a-z0-9]/g, '_')
@@ -168,7 +167,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         .replace(/^_|_$/g, '')
         .slice(0, 16);
       
-      setUsernameInput(cleanSuggestion || 'eco_student');
+      setUsernameInput(cleanSuggestion || 'eco_member');
       setStep('username');
     } catch (err: any) {
       setErrorMsg(err?.message || 'Network error verifying code. Please check your connection.');
@@ -199,7 +198,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setErrorMsg('');
 
     try {
-      // Finalize backend verification record
       await fetch('/api/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -224,9 +222,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
       password: passwordInput,
       role: 'Student',
-      grade: 'Grade 10',
-      profession: 'Student',
-      points: 100, // Welcome bonus!
+      grade: 'Eco Contributor',
+      profession: 'Sustainability Innovator',
+      points: 100, // Welcome bonus
       weeklyPoints: 100,
       rank: students.length + 1,
       badges: ['badge-waste-warrior'],
@@ -267,436 +265,439 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     !students.some((s) => s.username?.toLowerCase() === usernameInput.toLowerCase().replace(/[^a-z0-9_]/g, ''));
 
   return (
-    <div
-      className="modal show d-block"
-      tabIndex={-1}
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1060 }}
-    >
-      <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div className="modal-content border border-4 border-dark rounded-0 shadow-[8px_8px_0px_0px_black] bg-white overflow-hidden">
-          
-          <div className="row g-0">
-            {/* Left Column: Visual Banner */}
-            <div className="col-12 col-lg-5 d-none d-lg-block">
-              <EcoAuthBanner mode="register" />
-            </div>
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="w-full max-w-4xl rounded-3xl border border-white/10 bg-[#080c1d] shadow-[0_0_80px_rgba(0,0,0,0.9)] overflow-hidden my-auto animate-scaleUp">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[540px]">
+          {/* Left Column: Visual Banner */}
+          <div className="hidden lg:block lg:col-span-5">
+            <EcoAuthBanner mode="register" />
+          </div>
 
-            {/* Right Column: Registration Form */}
-            <div className="col-12 col-lg-7 d-flex flex-column justify-content-between bg-white p-4 p-md-5">
-              
-              <div>
-                {/* Modal Header */}
-                <div className="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom border-dark">
-                  <div className="d-flex align-items-center gap-2.5">
-                    <div className="p-2 bg-dark text-warning rounded-0 border border-2 border-dark">
-                      <UserCheck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="fw-black text-dark text-uppercase tracking-tight m-0">
-                        {registeredStudent 
-                          ? 'ACCOUNT CREATED' 
-                          : step === 'username'
-                          ? 'CHOOSE YOUR USERNAME'
-                          : step === 'verify' 
-                          ? 'VERIFY EMAIL ADDRESS' 
-                          : 'CREATE STUDENT ACCOUNT'}
-                      </h4>
-                      <p className="text-muted small m-0 mt-0.5">
-                        {registeredStudent 
-                          ? 'Your Verde Tech profile is verified and ready' 
-                          : step === 'username'
-                          ? 'Set your unique handle and Instagram-style follow privacy'
-                          : step === 'verify' 
-                          ? 'Enter the 6-digit confirmation code sent to your inbox' 
-                          : 'Fill in your credentials to join campus climate actions'}
-                      </p>
-                    </div>
+          {/* Right Column: Registration Form */}
+          <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
+            
+            <div>
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-400/30 text-cyan-300">
+                    <UserCheck className="w-5 h-5" />
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="btn-close rounded-0"
-                    aria-label="Close"
-                  />
+                  <div>
+                    <h4 className="text-xl font-bold font-display text-white uppercase tracking-tight">
+                      {registeredStudent 
+                        ? 'ACCOUNT CREATED' 
+                        : step === 'username'
+                        ? 'CHOOSE YOUR USERNAME'
+                        : step === 'verify' 
+                        ? 'VERIFY EMAIL ADDRESS' 
+                        : 'CREATE MEMBER ACCOUNT'}
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {registeredStudent 
+                        ? 'Your Verde Tech profile is verified and ready' 
+                        : step === 'username'
+                        ? 'Set your unique handle and network privacy'
+                        : step === 'verify' 
+                        ? 'Enter the 6-digit confirmation code sent to your inbox' 
+                        : 'Register to record sustainability actions and earn rewards'}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Error Notice */}
-                {errorMsg && (
-                  <div className="alert alert-danger rounded-0 border border-2 border-dark text-dark fw-bold small py-2 d-flex align-items-center gap-2 mb-3">
-                    <AlertTriangle className="w-4 h-4 text-danger flex-shrink-0" />
-                    <span>{errorMsg}</span>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Error Notice */}
+              {errorMsg && (
+                <div className="p-3.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs sm:text-sm flex items-center gap-2.5 mb-4 animate-fadeIn">
+                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
+              {/* Success View */}
+              {registeredStudent ? (
+                <div className="text-center py-4 space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-400/40 flex items-center justify-center text-emerald-300 mx-auto shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+                    <CheckCircle2 className="w-10 h-10 animate-bounce" />
                   </div>
-                )}
 
-                {/* Success View */}
-                {registeredStudent ? (
-                  <div className="text-center py-3">
-                    <div className="p-3 bg-dark text-success rounded-0 border border-3 border-dark d-inline-flex mx-auto mb-3 shadow-[4px_4px_0px_0px_black]">
-                      <CheckCircle2 className="w-10 h-10" />
+                  <h3 className="text-2xl font-bold font-display text-white">
+                    Welcome, @{registeredStudent.username}!
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-300 max-w-sm mx-auto leading-relaxed">
+                    Your Verde Tech profile is verified and credited with <strong className="text-cyan-400">+100 Welcome Points</strong>.
+                  </p>
+
+                  {/* Username Handle Box */}
+                  <div className="p-5 rounded-2xl bg-black/60 border border-cyan-400/40 max-w-sm mx-auto space-y-2">
+                    <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
+                      Your Official Verde Tech Handle
+                    </span>
+                    <div className="text-2xl sm:text-3xl font-mono font-extrabold text-cyan-300">
+                      @{registeredStudent.username}
                     </div>
-
-                    <h3 className="fw-black text-dark text-uppercase mb-2">
-                      Welcome, @{registeredStudent.username}!
-                    </h3>
-                    <p className="text-muted small mb-4">
-                      Your Verde Tech profile is verified and credited with <strong>+100 Welcome Points</strong>.
-                    </p>
-
-                    {/* Username Handle Box */}
-                    <div className="card bg-light border border-3 border-dark rounded-0 p-4 mb-4 shadow-[4px_4px_0px_0px_black] text-center">
-                      <span className="small fw-bold text-muted text-uppercase d-block mb-1">
-                        Your Official Verde Tech Handle
+                    <div>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-400/20">
+                        Privacy: {registeredStudent.followPrivacy === 'direct' ? 'Direct Follow' : registeredStudent.followPrivacy === 'request' ? 'Request to Follow' : 'Private'}
                       </span>
-                      <div className="fs-1 fw-black font-monospace text-success lh-1 mb-2">
-                        @{registeredStudent.username}
-                      </div>
-                      <div className="mb-3">
-                        <span className="badge bg-dark text-white rounded-0 px-2.5 py-1 text-uppercase small">
-                          Network: {registeredStudent.followPrivacy === 'direct' ? 'Direct Follow' : registeredStudent.followPrivacy === 'request' ? 'Request to Follow' : 'Private'}
-                        </span>
-                      </div>
-
-                      <div className="d-flex justify-content-center">
-                        <button
-                          type="button"
-                          onClick={handleCopyUsername}
-                          className="btn btn-outline-dark btn-sm rounded-0 border-2 fw-bold d-flex align-items-center gap-1.5"
-                        >
-                          {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                          <span>{copied ? 'Copied to Clipboard!' : 'Copy Username'}</span>
-                        </button>
-                      </div>
                     </div>
 
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyUsername}
+                        className="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-200 hover:text-white transition-all inline-flex items-center gap-1.5"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copied ? 'Copied to Clipboard!' : 'Copy Handle'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
                     <button
                       type="button"
                       onClick={handleFinishLogin}
-                      className="btn btn-success text-white w-100 fw-black text-uppercase rounded-0 border border-3 border-dark py-3 fs-5 shadow-[4px_4px_0px_0px_black] d-flex align-items-center justify-content-center gap-2"
+                      className="w-full btn-stai-cyan justify-center py-3.5 text-sm font-bold uppercase tracking-wider"
                     >
-                      <span>Enter Verde Tech Dashboard</span>
-                      <ArrowRight className="w-5 h-5" />
+                      <span>Enter Verde Tech Portal</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
-                ) : step === 'username' ? (
-                  /* Step 3: Choose Username & Privacy Settings */
-                  <form onSubmit={handleCompleteUsernameSetup}>
-                    <div className="alert alert-success border border-2 border-dark rounded-0 p-3 small fw-bold mb-3 d-flex align-items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span>Email verified successfully! Pick your unique @username to complete setup.</span>
-                    </div>
+                </div>
+              ) : step === 'username' ? (
+                /* Step 3: Choose Username & Privacy Settings */
+                <form onSubmit={handleCompleteUsernameSetup} className="space-y-4">
+                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <span>Email verified! Pick your unique @handle to complete your profile.</span>
+                  </div>
 
-                    <div className="mb-3">
-                      <div className="d-flex justify-content-between align-items-center mb-1">
-                        <label className="form-label fw-bold text-dark text-uppercase small m-0">
-                          Student Username Handle *
-                        </label>
-                        {usernameInput.trim().length >= 3 && (
-                          <span className={`small fw-bold ${isUsernameAvailable ? 'text-success' : 'text-danger'}`}>
-                            {isUsernameAvailable ? '✓ Handle Available' : '⚠️ Username Taken'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="input-group">
-                        <span className="input-group-text bg-dark text-warning fw-black rounded-0 border-2 border-dark fs-5">
-                          @
-                        </span>
-                        <input
-                          type="text"
-                          required
-                          value={usernameInput}
-                          onChange={(e) => setUsernameInput(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                          placeholder="your_handle"
-                          className="form-control form-control-lg rounded-0 border-2 border-dark font-monospace fw-bold"
-                          maxLength={20}
-                        />
-                      </div>
-                      <span className="form-text text-muted small">
-                        3-20 characters: letters, numbers, and underscores only.
-                      </span>
-                    </div>
-
-                    {/* Instagram-style Follow Privacy Selection */}
-                    <div className="mb-4">
-                      <label className="form-label fw-bold text-dark text-uppercase small mb-2 d-block">
-                        Follow & Connection Privacy
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-xs font-mono text-cyan-300 uppercase tracking-wider">
+                        Username Handle *
                       </label>
-                      <div className="space-y-2">
-                        <label 
-                          className={`d-flex align-items-start gap-3 p-3 border-2 border-dark cursor-pointer rounded-0 transition-colors ${
-                            followPrivacyInput === 'direct' ? 'bg-success-subtle border-success' : 'bg-light'
-                          }`}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <input
-                            type="radio"
-                            name="followPrivacy"
-                            value="direct"
-                            checked={followPrivacyInput === 'direct'}
-                            onChange={() => setFollowPrivacyInput('direct')}
-                            className="mt-1"
-                          />
-                          <div>
-                            <span className="fw-black text-dark text-uppercase small d-block">
-                              Direct Follow (Public)
-                            </span>
-                            <span className="text-muted small">
-                              Any classmate can follow you instantly with one click and see your green actions.
-                            </span>
-                          </div>
-                        </label>
-
-                        <label 
-                          className={`d-flex align-items-start gap-3 p-3 border-2 border-dark cursor-pointer rounded-0 transition-colors ${
-                            followPrivacyInput === 'request' ? 'bg-success-subtle border-success' : 'bg-light'
-                          }`}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <input
-                            type="radio"
-                            name="followPrivacy"
-                            value="request"
-                            checked={followPrivacyInput === 'request'}
-                            onChange={() => setFollowPrivacyInput('request')}
-                            className="mt-1"
-                          />
-                          <div>
-                            <span className="fw-black text-dark text-uppercase small d-block">
-                              Request to Follow
-                            </span>
-                            <span className="text-muted small">
-                              Peers must send a follow request; you accept or decline in your Profile section.
-                            </span>
-                          </div>
-                        </label>
-
-                        <label 
-                          className={`d-flex align-items-start gap-3 p-3 border-2 border-dark cursor-pointer rounded-0 transition-colors ${
-                            followPrivacyInput === 'private' ? 'bg-success-subtle border-success' : 'bg-light'
-                          }`}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <input
-                            type="radio"
-                            name="followPrivacy"
-                            value="private"
-                            checked={followPrivacyInput === 'private'}
-                            onChange={() => setFollowPrivacyInput('private')}
-                            className="mt-1"
-                          />
-                          <div>
-                            <span className="fw-black text-dark text-uppercase small d-block">
-                              Private Account
-                            </span>
-                            <span className="text-muted small">
-                              Requires approval for followers; your profile and activity log remain private.
-                            </span>
-                          </div>
-                        </label>
-                      </div>
+                      {usernameInput.trim().length >= 3 && (
+                        <span className={`text-[11px] font-mono font-bold ${isUsernameAvailable ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {isUsernameAvailable ? '✓ Handle Available' : '⚠️ Username Taken'}
+                        </span>
+                      )}
                     </div>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 font-mono font-bold text-sm">
+                        @
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={usernameInput}
+                        onChange={(e) => setUsernameInput(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                        placeholder="your_handle"
+                        className="w-full bg-black/50 border border-white/15 focus:border-cyan-400 rounded-xl pl-9 pr-4 py-2.5 text-xs sm:text-sm font-mono text-white placeholder-slate-500 outline-none transition-colors"
+                        maxLength={20}
+                      />
+                    </div>
+                    <span className="text-[11px] font-mono text-slate-400 mt-1 block">
+                      3-20 characters: letters, numbers, and underscores only.
+                    </span>
+                  </div>
 
+                  {/* Network Follow Privacy */}
+                  <div>
+                    <label className="text-xs font-mono text-cyan-300 uppercase tracking-wider block mb-2">
+                      Network Connection Privacy
+                    </label>
+                    <div className="space-y-2">
+                      <label 
+                        className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                          followPrivacyInput === 'direct' 
+                            ? 'bg-cyan-500/10 border-cyan-400/50 text-white' 
+                            : 'bg-white/[0.02] border-white/10 text-slate-300 hover:bg-white/5'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="followPrivacy"
+                          value="direct"
+                          checked={followPrivacyInput === 'direct'}
+                          onChange={() => setFollowPrivacyInput('direct')}
+                          className="mt-0.5 accent-cyan-400"
+                        />
+                        <div>
+                          <span className="font-bold text-xs font-mono uppercase block text-cyan-300">
+                            Direct Follow (Public)
+                          </span>
+                          <span className="text-[11px] text-slate-400 block mt-0.5">
+                            Any member can follow you and view your sustainability actions.
+                          </span>
+                        </div>
+                      </label>
+
+                      <label 
+                        className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                          followPrivacyInput === 'request' 
+                            ? 'bg-cyan-500/10 border-cyan-400/50 text-white' 
+                            : 'bg-white/[0.02] border-white/10 text-slate-300 hover:bg-white/5'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="followPrivacy"
+                          value="request"
+                          checked={followPrivacyInput === 'request'}
+                          onChange={() => setFollowPrivacyInput('request')}
+                          className="mt-0.5 accent-cyan-400"
+                        />
+                        <div>
+                          <span className="font-bold text-xs font-mono uppercase block text-cyan-300">
+                            Request to Follow
+                          </span>
+                          <span className="text-[11px] text-slate-400 block mt-0.5">
+                            Members send follow requests for your approval before connecting.
+                          </span>
+                        </div>
+                      </label>
+
+                      <label 
+                        className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                          followPrivacyInput === 'private' 
+                            ? 'bg-cyan-500/10 border-cyan-400/50 text-white' 
+                            : 'bg-white/[0.02] border-white/10 text-slate-300 hover:bg-white/5'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="followPrivacy"
+                          value="private"
+                          checked={followPrivacyInput === 'private'}
+                          onChange={() => setFollowPrivacyInput('private')}
+                          className="mt-0.5 accent-cyan-400"
+                        />
+                        <div>
+                          <span className="font-bold text-xs font-mono uppercase block text-cyan-300">
+                            Private Account
+                          </span>
+                          <span className="text-[11px] text-slate-400 block mt-0.5">
+                            Requires approval for all connections; logs remain private.
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isLoading || !isUsernameAvailable}
-                      className="btn btn-success text-white w-100 fw-black text-uppercase rounded-0 border border-3 border-dark py-3 fs-5 shadow-[4px_4px_0px_0px_black] d-flex align-items-center justify-content-center gap-2"
+                      className="w-full btn-stai-cyan justify-center py-3 text-sm font-bold uppercase tracking-wider"
                     >
                       {isLoading ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                           <span>Finalizing Profile...</span>
                         </>
                       ) : (
                         <>
-                          <span>Claim @{usernameInput || 'handle'} & Enter Dashboard</span>
-                          <ArrowRight className="w-5 h-5" />
+                          <span>Claim @{usernameInput || 'handle'} & Enter Portal</span>
+                          <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </button>
-                  </form>
-                ) : step === 'verify' ? (
-                  /* Step 2: Verification Code Entry */
-                  <div>
-                    <div className="alert alert-warning border border-2 border-dark rounded-0 p-3 small fw-bold mb-3">
-                      We sent a 6-digit confirmation code to <strong>{emailInput}</strong>.
-                      {deliveryError && (
-                        <div className="alert alert-danger border border-2 border-dark rounded-0 p-2 mt-2 mb-0 text-dark small fw-bold">
-                          <strong>⚠️ Email Delivery Notice:</strong> {deliveryError}
-                        </div>
-                      )}
-                      {resendNotice && (
-                        <div className="alert alert-success border border-2 border-dark rounded-0 p-2 mt-2 mb-0 text-success small fw-bold">
-                          {resendNotice}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mb-3">
-                      <div className="d-flex justify-content-between align-items-center mb-1">
-                        <label className="form-label fw-bold text-dark text-uppercase small m-0">
-                          6-Digit Email Verification Code
-                        </label>
-                        <button
-                          type="button"
-                          onClick={handleResendCode}
-                          disabled={isResending}
-                          className="btn btn-link btn-sm text-success fw-bold p-0 text-decoration-underline"
-                        >
-                          {isResending ? 'Sending...' : 'Resend Code'}
-                        </button>
+                  </div>
+                </form>
+              ) : step === 'verify' ? (
+                /* Step 2: Verification Code Entry */
+                <div className="space-y-4">
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-200 text-xs">
+                    Confirmation code dispatched to <strong>{emailInput}</strong>.
+                    {deliveryError && (
+                      <div className="mt-2 text-xs text-amber-300">
+                        <strong>Notice:</strong> {deliveryError}
                       </div>
-                      <input
-                        type="text"
-                        maxLength={6}
-                        value={verificationCode}
-                        onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, ''))}
-                        placeholder="123456"
-                        className="form-control form-control-lg rounded-0 border-2 border-dark text-center font-monospace fw-black fs-2 tracking-widest"
-                      />
+                    )}
+                    {resendNotice && (
+                      <div className="mt-2 text-xs text-emerald-300">
+                        {resendNotice}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-xs font-mono text-cyan-300 uppercase tracking-wider">
+                        6-Digit Verification Code
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleResendCode}
+                        disabled={isResending}
+                        className="text-xs font-mono text-cyan-400 hover:underline"
+                      >
+                        {isResending ? 'Sending...' : 'Resend Code'}
+                      </button>
                     </div>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, ''))}
+                      placeholder="123456"
+                      className="w-full bg-black/60 border border-cyan-400/40 rounded-xl py-3 text-center font-mono font-extrabold text-2xl tracking-[0.3em] text-cyan-300 outline-none"
+                    />
+                  </div>
 
-                    <div className="d-flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setStep('form');
-                          setErrorMsg('');
-                          setResendNotice('');
-                        }}
-                        className="btn btn-outline-dark rounded-0 border-2 fw-bold px-3 py-2.5"
-                      >
-                        <ArrowLeft className="w-4 h-4 me-1 inline" />
-                        Back
-                      </button>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep('form');
+                        setErrorMsg('');
+                        setResendNotice('');
+                      }}
+                      className="px-4 py-2.5 rounded-full border border-white/10 text-slate-300 hover:bg-white/5 font-mono text-xs transition-colors flex items-center gap-1.5"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Back</span>
+                    </button>
 
-                      <button
-                        type="button"
-                        onClick={handleVerifyCode}
-                        disabled={isLoading || verificationCode.trim().length < 6}
-                        className="btn btn-success text-white flex-grow-1 fw-black text-uppercase rounded-0 border border-2 border-dark py-2.5 shadow-[3px_3px_0px_0px_black]"
-                      >
-                        {isLoading ? 'Verifying Code...' : 'Verify & Pick Username'}
-                      </button>
+                    <button
+                      type="button"
+                      onClick={handleVerifyCode}
+                      disabled={isLoading || verificationCode.trim().length < 6}
+                      className="flex-1 btn-stai-cyan justify-center py-2.5 text-xs font-bold uppercase tracking-wider"
+                    >
+                      {isLoading ? 'Verifying...' : 'Verify Code'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Step 1: Registration Form */
+                <form onSubmit={handleProceedToVerification} className="space-y-3.5">
+                  <div>
+                    <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={nameInput}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      placeholder="e.g. Alex Morgan"
+                      className="w-full bg-black/50 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono text-white placeholder-slate-500 outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="email"
+                        required
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        placeholder="member@domain.com"
+                        className="w-full bg-black/50 border border-white/15 focus:border-cyan-400 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm font-mono text-white placeholder-slate-500 outline-none transition-colors"
+                      />
                     </div>
                   </div>
-                ) : (
-                  /* Step 1: Registration Form */
-                  <form onSubmit={handleProceedToVerification}>
-                    <div className="mb-3">
-                      <label className="form-label fw-bold text-dark text-uppercase small mb-1">
-                        Full Student Name
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={nameInput}
-                        onChange={(e) => setNameInput(e.target.value)}
-                        placeholder=""
-                        className="form-control rounded-0 border-2 border-dark fw-bold"
-                      />
-                    </div>
 
-                    <div className="mb-3">
-                      <label className="form-label fw-bold text-dark text-uppercase small mb-1">
-                        Student Email ID
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                        Password (Min 6 Chars)
                       </label>
-                      <div className="input-group">
-                        <span className="input-group-text bg-light rounded-0 border-2 border-dark">
-                          <Mail className="w-4 h-4" />
-                        </span>
+                      <div className="relative">
                         <input
-                          type="email"
+                          type={showPassword ? 'text' : 'password'}
                           required
-                          value={emailInput}
-                          onChange={(e) => setEmailInput(e.target.value)}
-                          placeholder="student@school.edu"
-                          className="form-control rounded-0 border-2 border-dark fw-bold"
+                          value={passwordInput}
+                          onChange={(e) => setPasswordInput(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full bg-black/50 border border-white/15 focus:border-cyan-400 rounded-xl pl-3.5 pr-10 py-2.5 text-xs sm:text-sm font-mono text-white placeholder-slate-500 outline-none transition-colors"
                         />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        >
+                          {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
                       </div>
                     </div>
 
-                    <div className="row g-3 mb-3">
-                      <div className="col-12 col-md-6">
-                        <label className="form-label fw-bold text-dark text-uppercase small mb-1">
-                          Password (Min 6 Chars)
-                        </label>
-                        <div className="input-group">
-                          <input
-                            type={showPassword ? 'text' : 'password'}
-                            required
-                            value={passwordInput}
-                            onChange={(e) => setPasswordInput(e.target.value)}
-                            placeholder="••••••••"
-                            className="form-control rounded-0 border-2 border-dark font-monospace"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="btn btn-outline-dark rounded-0 border-2 border-dark"
-                          >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="col-12 col-md-6">
-                        <label className="form-label fw-bold text-dark text-uppercase small mb-1">
-                          Confirm Password
-                        </label>
-                        <div className="input-group">
-                          <input
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            required
-                            value={confirmPasswordInput}
-                            onChange={(e) => setConfirmPasswordInput(e.target.value)}
-                            placeholder="••••••••"
-                            className="form-control rounded-0 border-2 border-dark font-monospace"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="btn btn-outline-dark rounded-0 border-2 border-dark"
-                          >
-                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
+                    <div>
+                      <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                        Confirm Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          required
+                          value={confirmPasswordInput}
+                          onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full bg-black/50 border border-white/15 focus:border-cyan-400 rounded-xl pl-3.5 pr-10 py-2.5 text-xs sm:text-sm font-mono text-white placeholder-slate-500 outline-none transition-colors"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
                       </div>
                     </div>
+                  </div>
 
+                  <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="btn btn-success text-white w-100 fw-black text-uppercase rounded-0 border border-3 border-dark py-3 fs-5 shadow-[4px_4px_0px_0px_black] d-flex align-items-center justify-content-center gap-2 mt-3"
+                      className="w-full btn-stai-cyan justify-center py-3 text-sm font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(94,242,255,0.3)]"
                     >
                       {isLoading ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                           <span>Preparing Registration...</span>
                         </>
                       ) : (
                         <>
                           <span>Continue to Email Verification</span>
-                          <ArrowRight className="w-5 h-5" />
+                          <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </button>
-                  </form>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div className="pt-3 mt-4 border-top border-dark d-flex align-items-center justify-content-between text-muted small">
-                <span className="d-flex align-items-center gap-1.5 fw-bold">
-                  <ShieldCheck className="w-4 h-4 text-success" />
-                  <span>Verde Tech Identity Provider</span>
-                </span>
-                <span className="font-monospace">VERDETECH 2026</span>
-              </div>
-
+                  </div>
+                </form>
+              )}
             </div>
-          </div>
 
+            {/* Modal Footer */}
+            <div className="pt-4 border-t border-white/10 flex items-center justify-between text-slate-400 text-xs font-mono">
+              <span className="flex items-center gap-1.5 text-emerald-400">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Verde Tech Security</span>
+              </span>
+              <span>VERDETECH 2026</span>
+            </div>
+
+          </div>
         </div>
+
       </div>
     </div>
   );

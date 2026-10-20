@@ -75,7 +75,7 @@ else:
             Smart Bin Eco Impact Simulator
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Simulate how regular Smart Bin waste disposal requests multiply Verde Points and waste diversion across campus!
+            Simulate how regular Smart Bin waste disposal requests multiply Verde Points and waste diversion overall!
           </p>
         </div>
       </div>
@@ -150,7 +150,7 @@ else:
           <div>
             <h3 className="font-bold text-white text-base flex items-center space-x-2 mb-4">
               <TrendingUp className="w-5 h-5 text-emerald-400" />
-              <span>Projected Campus Impact</span>
+              <span>Projected Environmental Impact</span>
             </h3>
 
             <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/30 text-center space-y-2">
@@ -161,7 +161,7 @@ else:
                 +{weeklyPoints.toLocaleString()} <span className="text-sm font-normal text-slate-400">pts/week</span>
               </div>
               <p className="text-xs text-emerald-300 font-medium">
-                Verified Smart Bin usage keeps campus waste segregated and clean.
+                Verified Smart Bin usage keeps community waste segregated and clean.
               </p>
             </div>
 

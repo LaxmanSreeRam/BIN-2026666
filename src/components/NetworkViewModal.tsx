@@ -97,7 +97,7 @@ export const NetworkViewModal: React.FC<NetworkViewModalProps> = ({
               <div>
                 <h4 className="fw-black text-uppercase text-white m-0">Verde Tech Peer Network</h4>
                 <p className="small text-light fw-medium m-0 opacity-90">
-                  Connect with classmates across campus, build your sustainability network, and cheer daily green actions.
+                  Connect with fellow eco innovators, build your sustainability network, and cheer daily green actions.
                 </p>
               </div>
             </div>
@@ -151,7 +151,7 @@ export const NetworkViewModal: React.FC<NetworkViewModalProps> = ({
           <div className="modal-body bg-white text-dark p-4 overflow-y-auto" style={{ maxHeight: '55vh' }}>
             {filteredList.length === 0 ? (
               <div className="text-center py-5 text-muted small fw-bold">
-                No students found matching your search.
+                No members found matching your search.
               </div>
             ) : (
               <div className="space-y-3">
@@ -217,7 +217,7 @@ export const NetworkViewModal: React.FC<NetworkViewModalProps> = ({
                             onClose();
                           }}
                           className="btn btn-sm btn-dark text-white rounded-0 border border-2 border-dark px-2.5 py-1.5 shadow-[2px_2px_0px_0px_black] d-inline-flex align-items-center gap-1"
-                          title="Message Student"
+                          title="Message Member"
                         >
                           <Send className="w-3.5 h-3.5 text-warning" />
                           <span className="small fw-bold d-none d-sm-inline">Message</span>

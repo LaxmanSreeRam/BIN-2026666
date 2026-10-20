@@ -75,7 +75,7 @@ export const ChallengesList: React.FC<ChallengesListProps> = ({
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 text-xs font-semibold mb-2">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Campus Action Directory</span>
+            <span>Eco Action Directory</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Sustainability Challenges
@@ -187,19 +187,14 @@ export const ChallengesList: React.FC<ChallengesListProps> = ({
 
             </div>
 
-            {/* Card Footer Action */}
+            {/* Card Footer */}
             <div className="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
               <span className="text-[11px] text-slate-400 font-medium">
                 Difficulty: <span className="text-slate-200 font-semibold">{challenge.difficulty}</span>
               </span>
-
-              <button
-                onClick={() => onSelectChallengeToLog(challenge)}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-2xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Log Action</span>
-              </button>
+              <span className="text-xs font-mono text-cyan-400">
+                +{challenge.pointsReward} Points
+              </span>
             </div>
 
           </div>

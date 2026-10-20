@@ -221,7 +221,7 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
                       className="btn btn-warning text-dark btn-sm fw-black text-uppercase rounded-0 border border-2 border-dark py-1 px-2.5 shadow-[2px_2px_0px_0px_black] d-flex align-items-center gap-1"
                     >
                       <Gift className="w-3.5 h-3.5 text-dark" />
-                      <span>Redeem Gift Cards</span>
+                      <span>Redeem Code</span>
                     </button>
                   )}
                 </div>

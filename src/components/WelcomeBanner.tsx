@@ -92,7 +92,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
                 </>
               ) : (
                 <>
-                  Your student identity has been established on the ISWK Future Grid! Your handle is{' '}
+                  Your student identity has been established on the Verde Tech Grid! Your handle is{' '}
                   <strong className="font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-black/50 border border-white/10">
                     @{displayHandle}
                   </strong>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FeedPost, FeedComment, FeedCategory, Student } from '../types';
+import { FeedPost, FeedCategory, Student } from '../types';
 import { 
   Heart, 
   Flame, 
@@ -8,13 +8,14 @@ import {
   MessageCircle, 
   Send, 
   Trash2, 
-  Image as ImageIcon, 
   Sparkles,
   MapPin,
-  Tag,
   Search,
   Users,
-  RefreshCw
+  RefreshCw,
+  PlusCircle,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -65,14 +66,14 @@ const CATEGORIES: FeedCategory[] = [
 ];
 
 const DOING_SUGGESTIONS = [
-  'Planted green herbs & flowers in school garden',
-  'Switched off all empty classroom lights & AC',
-  'Bicycled / walked to campus instead of motor ride',
-  'Used reusable stainless steel bottle & cloth bag',
+  'Planted green herbs & flowers in botanical area',
+  'Switched off all empty room lights & AC',
+  'Bicycled or walked instead of motorized transport',
+  'Used reusable bottle & reusable cloth bag',
   'Collected and segregated paper & cardboard',
-  'Made a zero-waste homemade packed lunch',
-  'Composted vegetable peels & fruit skins',
-  'Repaired & upcycled an old backpack',
+  'Prepared a zero-waste packed meal',
+  'Composted organic fruit & vegetable peels',
+  'Upcycled packaging materials for prototypes',
 ];
 
 export const CommunityFeed: React.FC<CommunityFeedProps> = ({
@@ -83,7 +84,6 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
   onReactToPost,
   onAddComment,
   onDeletePost,
-  onClearAllPosts,
   onRefreshFeed,
   onSelectStudent,
   onOpenNetworkModal,
@@ -126,12 +126,12 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentStudent) {
-      alert('Please sign in to interact and share your daily green doings on the feed.');
+      alert('Please sign in to share your eco actions on the feed.');
       return;
     }
 
     if (!content.trim()) {
-      alert('Please describe what green action or doing you took today!');
+      alert('Please describe what eco action or innovation you undertook!');
       return;
     }
 
@@ -140,7 +140,7 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#198754', '#ffc107', '#0dcaf0', '#20c997'],
+        colors: ['#5ef2ff', '#34d399', '#a78bfa', '#fde047'],
       });
     } catch {
       // ignore
@@ -149,7 +149,7 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
     onAddPost({
       grNo: currentStudent.grNo,
       authorName: currentStudent.name,
-      authorRole: currentStudent.role || 'Student',
+      authorRole: currentStudent.role || 'Member',
       authorAvatar: currentStudent.avatarUrl,
       title: doingTag.trim() || undefined,
       content: content.trim(),
@@ -163,7 +163,7 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
     setDoingTag('');
     setPhotoUrl('');
     setLocation('');
-    setPostBanner('Your doing was shared with the community! Fellow peers can now interact, cheer, and comment.');
+    setPostBanner('Action shared with the community! Members can now interact, cheer, and collaborate.');
 
     setTimeout(() => {
       setPostBanner(null);
@@ -220,161 +220,183 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
   });
 
   return (
-    <div className="container py-4 space-y-4">
+    <div className="space-y-6">
       
-      {/* Feed Header */}
-      <div className="card bg-success text-white p-4 p-md-5 rounded-0 border border-4 border-dark shadow-[6px_6px_0px_0px_black]">
-        <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
-          <div className="space-y-2">
-            <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-              <span className="badge bg-dark text-white fw-bold px-3 py-2 rounded-0 border border-2 border-white">
-                <Users className="w-3.5 h-3.5 me-1 text-success" />
-                Peer Social Wall
+      {/* Feed Hero Header */}
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#080c1b]/80 backdrop-blur-2xl p-6 sm:p-10 shadow-2xl">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-80" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="hud-pill">
+                <span className="hud-dot" />
+                <span>ECO FEED // LIVE</span>
               </span>
-              <span className="badge bg-warning text-dark fw-bold px-3 py-2 rounded-0 border border-2 border-dark">
-                Live Feed Active
-              </span>
-              <span className="badge bg-light text-dark fw-bold px-3 py-2 rounded-0 border border-2 border-dark">
-                💬 {posts.length} Community Updates
+              <span className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-400/30 text-violet-300 text-xs font-mono font-medium">
+                {posts.length} Community Updates
               </span>
             </div>
             
-            <h1 className="display-6 fw-black text-white text-uppercase m-0">
-              Verde Tech Community Feed
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-display">
+              Verde Tech <span className="stai-gradient-text">Eco Feed</span>
             </h1>
             
-            <p className="text-light fw-medium fs-6 m-0 opacity-90">
-              A dedicated social space for peers to interact, discuss, and cheer each other on regarding daily green doings, sustainable lifestyles, and eco tips. Real-time updates sync instantly across campus!
+            <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
+              Real-time community social feed. Share verified green deeds, upcycling projects, clean energy tips, and cheer on fellow sustainability innovators.
             </p>
           </div>
 
-          <div className="d-flex flex-wrap align-items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             {onRefreshFeed && (
               <button
                 onClick={handleRefreshClick}
                 disabled={isRefreshing}
-                className="btn btn-light text-dark fw-bold rounded-0 border border-3 border-dark px-3 py-2 shadow-[2px_2px_0px_0px_black] d-flex align-items-center gap-1"
+                className="px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-cyan-300 font-mono text-xs transition-all flex items-center gap-2"
               >
-                <RefreshCw className={`w-4 h-4 text-success ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span>{isRefreshing ? 'Syncing...' : 'Refresh Feed'}</span>
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
+                <span>{isRefreshing ? 'Syncing...' : 'Sync Feed'}</span>
               </button>
             )}
+
             {onOpenNetworkModal && (
               <button
                 onClick={onOpenNetworkModal}
-                className="btn btn-warning text-dark fw-bold rounded-0 border border-3 border-dark px-3 py-2 shadow-[2px_2px_0px_0px_black] d-flex align-items-center gap-1"
+                className="btn-stai-outline"
               >
-                <Users className="w-4 h-4" />
-                <span>Campus Peer Network</span>
+                <Users className="w-3.5 h-3.5" />
+                <span>Member Network</span>
               </button>
             )}
           </div>
         </div>
-      </div>
+      </section>
 
+      {/* Post Banner Notification */}
       {postBanner && (
-        <div className="alert alert-success rounded-0 border border-3 border-dark fw-bold text-dark shadow-[4px_4px_0px_0px_black] d-flex align-items-center justify-content-between">
+        <div className="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-400/40 text-cyan-200 text-sm flex items-center gap-3 animate-fadeIn">
+          <Sparkles className="w-5 h-5 text-cyan-400 shrink-0" />
           <span>{postBanner}</span>
-          <button className="btn-close" onClick={() => setPostBanner(null)}></button>
         </div>
       )}
 
-      {/* Share / Composer Section */}
+      {/* Post Composer */}
       {currentStudent && (
-        <div className="card bg-white text-dark rounded-0 border border-4 border-dark shadow-[6px_6px_0px_0px_black] p-4">
-          <div className="d-flex align-items-center justify-content-between mb-3 border-bottom border-dark pb-3">
-            <div className="d-flex align-items-center gap-3">
-              <img
-                src={currentStudent.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                alt={currentStudent.name}
-                className="rounded-circle border border-2 border-dark"
-                style={{ width: '48px', height: '48px', objectFit: 'cover' }}
-              />
+        <div className="stai-card p-6 sm:p-8">
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full border border-cyan-400/40 p-0.5 overflow-hidden bg-slate-900 shrink-0">
+                <img
+                  src={currentStudent.avatarUrl || '/laxman_sree_ram.jpg'}
+                  alt={currentStudent.name}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
               <div>
-                <h5 className="fw-black text-uppercase m-0">Share What Green Action You Did</h5>
-                <p className="text-muted small m-0">Posting as {currentStudent.name} ({currentStudent.grNo})</p>
+                <h3 className="text-sm font-bold text-white font-display">
+                  Share Your Eco Action, {currentStudent.name}
+                </h3>
+                <span className="text-xs font-mono text-slate-400">
+                  Broadcast your sustainability initiatives to the network
+                </span>
               </div>
             </div>
+
             <button
               onClick={() => setIsComposerOpen(!isComposerOpen)}
-              className="btn btn-outline-dark btn-sm rounded-0 fw-bold border-2"
+              className="text-xs font-mono text-slate-400 hover:text-cyan-400 flex items-center gap-1"
             >
-              {isComposerOpen ? 'Minimize' : 'Expand Form'}
+              <span>{isComposerOpen ? 'Collapse' : 'Expand'}</span>
+              {isComposerOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
           </div>
 
           {isComposerOpen && (
-            <form onSubmit={handlePostSubmit} className="space-y-3">
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="form-label fw-bold text-uppercase small">Category of Doing</label>
+            <form onSubmit={handlePostSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
+                    Action Category
+                  </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as FeedCategory)}
-                    className="form-select rounded-0 border-2 border-dark fw-medium"
+                    className="w-full bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-200 outline-none transition-colors"
                   >
                     {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
+                      <option key={cat} value={cat} className="bg-slate-950 text-slate-200">
+                        {cat}
+                      </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label fw-bold text-uppercase small">Quick Doing Tag / Title</label>
+                <div>
+                  <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
+                    Headline / Quick Tag
+                  </label>
                   <input
                     type="text"
                     value={doingTag}
                     onChange={(e) => setDoingTag(e.target.value)}
-                    placeholder="e.g. Planted 5 Hibiscus Saplings"
-                    className="form-control rounded-0 border-2 border-dark fw-medium"
+                    placeholder="e.g. Upcycled 12 Plastic Containers"
+                    className="w-full bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-200 placeholder-slate-500 outline-none transition-colors"
                   />
                 </div>
 
-                <div className="col-12">
-                  <label className="form-label fw-bold text-uppercase small">Describe Your Green Action / Eco Tip *</label>
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
+                    Action Description & Eco Tip *
+                  </label>
                   <textarea
                     rows={3}
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    placeholder="Tell your peers what eco action you completed today..."
-                    className="form-control rounded-0 border-2 border-dark fw-medium"
+                    placeholder="Describe what eco-action you took today, why it matters, or share a practical tip..."
+                    className="w-full bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl p-3 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors"
                     required
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label fw-bold text-uppercase small">Photo URL (Optional)</label>
+                <div>
+                  <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
+                    Photo URL (Optional)
+                  </label>
                   <input
                     type="url"
                     value={photoUrl}
                     onChange={(e) => setPhotoUrl(e.target.value)}
                     placeholder="https://images.unsplash.com/photo-..."
-                    className="form-control rounded-0 border-2 border-dark fw-medium"
+                    className="w-full bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-200 placeholder-slate-500 outline-none transition-colors"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label fw-bold text-uppercase small">Campus Location</label>
+                <div>
+                  <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
+                    Location / Zone (Optional)
+                  </label>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. School Botanical Garden / Block B"
-                    className="form-control rounded-0 border-2 border-dark fw-medium"
+                    placeholder="e.g. Solar Pavilion / Resource Station"
+                    className="w-full bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-200 placeholder-slate-500 outline-none transition-colors"
                   />
                 </div>
               </div>
 
               {/* Suggestions */}
               <div className="pt-2">
-                <span className="d-block small fw-bold text-uppercase text-muted mb-2">Quick One-Tap Prompts:</span>
-                <div className="d-flex flex-wrap gap-1">
+                <span className="block text-[11px] font-mono text-slate-400 mb-2">
+                  Quick Prompts:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
                   {DOING_SUGGESTIONS.slice(0, 5).map((sugg) => (
                     <button
                       key={sugg}
                       type="button"
                       onClick={() => setDoingTag(sugg)}
-                      className="btn btn-sm btn-outline-success rounded-0 border-dark fw-medium text-dark bg-light"
+                      className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-400/40 text-slate-300 hover:text-cyan-300 text-xs font-mono transition-all"
                     >
                       + {sugg}
                     </button>
@@ -382,13 +404,13 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
                 </div>
               </div>
 
-              <div className="d-flex justify-content-end pt-3 border-top border-dark">
+              <div className="flex justify-end pt-3 border-t border-white/10">
                 <button
                   type="submit"
-                  className="btn btn-success text-white fw-black text-uppercase rounded-0 border border-3 border-dark px-4 py-2 shadow-[4px_4px_0px_0px_black] d-flex align-items-center gap-2"
+                  className="btn-stai-cyan text-sm"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Publish to Feed</span>
+                  <span>Publish Action</span>
                 </button>
               </div>
             </form>
@@ -397,61 +419,61 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="card bg-white text-dark rounded-0 border border-4 border-dark shadow-[4px_4px_0px_0px_black] p-3">
-        <div className="row g-3 align-items-center">
-          <div className="col-md-4">
-            <div className="input-group">
-              <span className="input-group-text bg-dark text-white rounded-0 border-dark">
-                <Search className="w-4 h-4" />
-              </span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search posts, authors, tags..."
-                className="form-control rounded-0 border-2 border-dark fw-medium"
-              />
-            </div>
+      <div className="stai-card p-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          
+          <div className="md:col-span-5 relative">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search actions, contributors, tags..."
+              className="w-full bg-black/50 border border-white/10 focus:border-cyan-400 rounded-xl pl-10 pr-4 py-2 text-xs font-mono text-slate-200 placeholder-slate-500 outline-none transition-colors"
+            />
           </div>
 
-          <div className="col-md-4">
+          <div className="md:col-span-4">
             <select
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
-              className="form-select rounded-0 border-2 border-dark fw-bold text-uppercase small"
+              className="w-full bg-black/50 border border-white/10 focus:border-cyan-400 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 outline-none transition-colors"
             >
-              <option value="All">All Categories ({posts.length})</option>
+              <option value="All" className="bg-slate-950">All Categories ({posts.length})</option>
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat} className="bg-slate-950">{cat}</option>
               ))}
             </select>
           </div>
 
-          <div className="col-md-4">
+          <div className="md:col-span-3">
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="form-select rounded-0 border-2 border-dark fw-bold text-uppercase small"
+              className="w-full bg-black/50 border border-white/10 focus:border-cyan-400 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 outline-none transition-colors"
             >
-              <option value="All">All Campus Locations</option>
+              <option value="All" className="bg-slate-950">All Locations</option>
               {uniqueLocations.map((loc) => (
-                <option key={loc} value={loc}>{loc}</option>
+                <option key={loc} value={loc} className="bg-slate-950">{loc}</option>
               ))}
             </select>
           </div>
+
         </div>
       </div>
 
       {/* Posts Stream */}
       <div className="space-y-4">
         {filteredPosts.length === 0 ? (
-          <div className="card bg-white text-dark rounded-0 border border-4 border-dark p-5 text-center shadow-[4px_4px_0px_0px_black]">
-            <Sparkles className="w-12 h-12 text-success mx-auto mb-3" />
-            <h4 className="fw-black text-uppercase">No Community Posts Found</h4>
-            <p className="text-muted fw-medium mb-3">Be the first to share your daily green action or adjust your filters!</p>
+          <div className="stai-card p-12 text-center">
+            <Sparkles className="w-12 h-12 text-cyan-400 mx-auto mb-3 opacity-60" />
+            <h4 className="text-xl font-bold font-display text-white mb-2">No Community Updates Found</h4>
+            <p className="text-sm text-slate-400 mb-4 max-w-md mx-auto">
+              Be the first to share your sustainability actions or reset your filters to view all entries.
+            </p>
             <button
               onClick={() => { setSelectedFilter('All'); setSelectedLocation('All'); setSearchQuery(''); }}
-              className="btn btn-success text-white fw-bold rounded-0 border border-2 border-dark px-4 py-2"
+              className="btn-stai-outline"
             >
               Reset Filters
             </button>
@@ -463,36 +485,42 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
             const isCommentingOpen = activeCommentPostId === post.id;
 
             return (
-              <div key={post.id} className="card bg-white text-dark rounded-0 border border-4 border-dark shadow-[6px_6px_0px_0px_black] p-4">
+              <article key={post.id} className="stai-card p-6 transition-all hover:border-cyan-400/30">
                 
                 {/* Author Info & Category */}
-                <div className="d-flex align-items-center justify-content-between mb-3 border-bottom border-dark pb-3">
+                <div className="flex items-center justify-between gap-4 pb-4 mb-4 border-b border-white/10">
                   <div 
                     onClick={() => handleAuthorClick(post.grNo, post.authorName)}
-                    className="d-flex align-items-center gap-3 cursor-pointer"
-                    style={{ cursor: 'pointer' }}
+                    className="flex items-center gap-3 cursor-pointer group"
                   >
-                    <img
-                      src={post.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                      alt={post.authorName}
-                      className="rounded-circle border border-2 border-dark"
-                      style={{ width: '48px', height: '48px', objectFit: 'cover' }}
-                    />
+                    <div className="w-11 h-11 rounded-full border border-cyan-400/40 p-0.5 overflow-hidden bg-slate-900 group-hover:border-cyan-300 transition-colors shrink-0">
+                      <img
+                        src={post.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
+                        alt={post.authorName}
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    </div>
+
                     <div>
-                      <div className="d-flex align-items-center gap-2">
-                        <h6 className="fw-black text-uppercase m-0">{post.authorName}</h6>
-                        <span className="badge bg-success text-white rounded-0 fw-bold px-2 py-1 small">{post.authorRole || 'Student'}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white group-hover:text-cyan-300 transition-colors text-sm">
+                          {post.authorName}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-cyan-950/60 text-cyan-400 border border-cyan-400/20">
+                          {post.authorRole || 'Contributor'}
+                        </span>
                       </div>
-                      <div className="d-flex align-items-center gap-2 text-muted small mt-1">
-                        <span>GR: {post.grNo}</span>
+
+                      <div className="flex items-center gap-2 text-xs font-mono text-slate-400 mt-0.5">
+                        <span>ID: {post.grNo}</span>
                         <span>•</span>
                         <span>{formatRelativeTime(post.timestamp)}</span>
                         {post.location && (
                           <>
                             <span>•</span>
-                            <span className="d-flex align-items-center gap-1 text-success fw-bold">
-                              <MapPin className="w-3.5 h-3.5" />
-                              {post.location}
+                            <span className="flex items-center gap-1 text-emerald-400">
+                              <MapPin className="w-3 h-3" />
+                              <span>{post.location}</span>
                             </span>
                           </>
                         )}
@@ -500,14 +528,14 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
                     </div>
                   </div>
 
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="badge bg-warning text-dark fw-bold px-2 py-1 rounded-0 border border-1 border-dark small">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
                       {post.category}
                     </span>
                     {isMyPost && (
                       <button
                         onClick={() => onDeletePost(post.id)}
-                        className="btn btn-outline-danger btn-sm rounded-0 border-2"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                         title="Delete post"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -516,26 +544,26 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
                   </div>
                 </div>
 
-                {/* Title / Tag */}
+                {/* Title / Doing Tag */}
                 {post.title && (
-                  <h5 className="fw-black text-uppercase text-success mb-2">
-                    {post.title}
-                  </h5>
+                  <h4 className="text-base sm:text-lg font-bold text-white font-display mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span>{post.title}</span>
+                  </h4>
                 )}
 
                 {/* Content */}
-                <p className="text-dark fw-medium fs-6 mb-3" style={{ whiteSpace: 'pre-line' }}>
+                <p className="text-slate-300 text-sm leading-relaxed mb-4 whitespace-pre-line">
                   {post.content}
                 </p>
 
-                {/* Photo */}
+                {/* Optional Photo */}
                 {post.photoUrl && (
-                  <div className="mb-3 border border-3 border-dark overflow-hidden bg-light">
+                  <div className="mb-4 rounded-2xl border border-white/10 overflow-hidden bg-black/40">
                     <img
                       src={post.photoUrl}
-                      alt="Green Doing Photo"
-                      className="w-100"
-                      style={{ maxHeight: '350px', objectFit: 'cover' }}
+                      alt="Action proof"
+                      className="w-full max-h-[380px] object-cover"
                       onError={(e) => {
                         (e.target as HTMLElement).style.display = 'none';
                       }}
@@ -544,92 +572,100 @@ export const CommunityFeed: React.FC<CommunityFeedProps> = ({
                 )}
 
                 {/* Reactions & Comments Count */}
-                <div className="d-flex flex-wrap align-items-center justify-content-between pt-3 border-top border-dark gap-2">
-                  <div className="d-flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center justify-between pt-4 border-t border-white/10 gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => onReactToPost(post.id, 'cheer')}
-                      className="btn btn-sm btn-outline-dark rounded-0 fw-bold border-2 d-flex align-items-center gap-1 bg-light"
+                      className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-400/30 text-xs font-mono text-slate-300 hover:text-red-300 transition-all flex items-center gap-1.5"
                     >
-                      <Heart className="w-4 h-4 text-danger fill-danger" />
+                      <Heart className="w-3.5 h-3.5 text-red-400" />
                       <span>Cheer ({post.reactions?.cheer || 0})</span>
                     </button>
+
                     <button
                       onClick={() => onReactToPost(post.id, 'fire')}
-                      className="btn btn-sm btn-outline-dark rounded-0 fw-bold border-2 d-flex align-items-center gap-1 bg-light"
+                      className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/30 text-xs font-mono text-slate-300 hover:text-amber-300 transition-all flex items-center gap-1.5"
                     >
-                      <Flame className="w-4 h-4 text-warning fill-warning" />
+                      <Flame className="w-3.5 h-3.5 text-amber-400" />
                       <span>Fire ({post.reactions?.fire || 0})</span>
                     </button>
+
                     <button
                       onClick={() => onReactToPost(post.id, 'leaf')}
-                      className="btn btn-sm btn-outline-dark rounded-0 fw-bold border-2 d-flex align-items-center gap-1 bg-light"
+                      className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-400/30 text-xs font-mono text-slate-300 hover:text-emerald-300 transition-all flex items-center gap-1.5"
                     >
-                      <Leaf className="w-4 h-4 text-success fill-success" />
-                      <span>Leaf ({post.reactions?.leaf || 0})</span>
+                      <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Eco ({post.reactions?.leaf || 0})</span>
                     </button>
+
                     <button
                       onClick={() => onReactToPost(post.id, 'lightbulb')}
-                      className="btn btn-sm btn-outline-dark rounded-0 fw-bold border-2 d-flex align-items-center gap-1 bg-light"
+                      className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-yellow-500/10 border border-white/10 hover:border-yellow-400/30 text-xs font-mono text-slate-300 hover:text-yellow-300 transition-all flex items-center gap-1.5"
                     >
-                      <Lightbulb className="w-4 h-4 text-warning fill-warning" />
+                      <Lightbulb className="w-3.5 h-3.5 text-yellow-400" />
                       <span>Tip ({post.reactions?.lightbulb || 0})</span>
                     </button>
                   </div>
 
                   <button
                     onClick={() => setActiveCommentPostId(isCommentingOpen ? null : post.id)}
-                    className="btn btn-sm btn-outline-success rounded-0 fw-bold border-2 d-flex align-items-center gap-1"
+                    className="px-3 py-1.5 rounded-full bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-400/30 text-xs font-mono text-cyan-300 transition-all flex items-center gap-1.5"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <MessageCircle className="w-3.5 h-3.5" />
                     <span>Comments ({commentsList.length})</span>
                   </button>
                 </div>
 
                 {/* Comments Section */}
                 {isCommentingOpen && (
-                  <div className="mt-3 pt-3 border-top border-dark bg-light p-3">
-                    <h6 className="fw-black text-uppercase small mb-2">Discussion & Cheers</h6>
+                  <div className="mt-4 pt-4 border-t border-white/10 space-y-3 bg-black/40 p-4 rounded-2xl">
+                    <h5 className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+                      Discussion & Collaborations
+                    </h5>
                     
                     {commentsList.length === 0 ? (
-                      <p className="text-muted small fst-italic mb-3">No comments yet. Be the first to encourage this peer!</p>
+                      <p className="text-xs font-mono text-slate-500 italic">
+                        No comments yet. Be the first to share thoughts or encourage this member!
+                      </p>
                     ) : (
-                      <div className="space-y-2 mb-3">
+                      <div className="space-y-2">
                         {commentsList.map((comm) => (
-                          <div key={comm.id} className="bg-white p-2.5 border border-2 border-dark rounded-0">
-                            <div className="d-flex align-items-center justify-content-between">
-                              <span className="fw-bold small text-success">{comm.authorName}</span>
-                              <span className="text-muted xsmall">{formatRelativeTime(comm.timestamp)}</span>
+                          <div key={comm.id} className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-bold text-white font-mono">{comm.authorName}</span>
+                              <span className="text-[10px] font-mono text-slate-500">{formatRelativeTime(comm.timestamp)}</span>
                             </div>
-                            <p className="text-dark small m-0 mt-1">{comm.content}</p>
+                            <p className="text-xs text-slate-300 m-0">{comm.content}</p>
                           </div>
                         ))}
                       </div>
                     )}
 
                     {currentStudent ? (
-                      <div className="input-group">
+                      <div className="flex gap-2 pt-2">
                         <input
                           type="text"
                           value={commentInputs[post.id] || ''}
                           onChange={(e) => setCommentInputs((prev) => ({ ...prev, [post.id]: e.target.value }))}
                           onKeyDown={(e) => { if (e.key === 'Enter') handleSendComment(post.id); }}
-                          placeholder="Write an encouraging comment..."
-                          className="form-control rounded-0 border-2 border-dark fw-medium"
+                          placeholder="Write a constructive thought or cheer..."
+                          className="flex-1 bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl px-3.5 py-2 text-xs font-mono text-slate-200 placeholder-slate-500 outline-none transition-colors"
                         />
                         <button
                           onClick={() => handleSendComment(post.id)}
-                          className="btn btn-success text-white fw-bold rounded-0 border border-2 border-dark px-3"
+                          className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all"
                         >
-                          <Send className="w-4 h-4" />
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Send</span>
                         </button>
                       </div>
                     ) : (
-                      <p className="text-muted small m-0">Please sign in to write a comment.</p>
+                      <p className="text-xs font-mono text-slate-500">Sign in to join the conversation.</p>
                     )}
                   </div>
                 )}
 
-              </div>
+              </article>
             );
           })
         )}

@@ -58,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>('00:00:00');
 
-  // Live ticking HUD clock (Muscat time / local time as in iswkoman.com/stai)
+  // Live ticking HUD clock
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
@@ -95,8 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-slate-600 hidden sm:inline">|</span>
             <span className="hidden sm:flex items-center gap-1 text-slate-400">
               <Compass className="w-3.5 h-3.5 text-cyan-400" />
-              <span>23.59° N · 58.54° E</span>
-              <span className="text-slate-500">(Muscat, Oman)</span>
+              <span>Eco Node</span>
             </span>
           </div>
 
@@ -163,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div 
                 onClick={() => {
                   if (!isLocked) fileInputRef.current?.click();
-                  else handleTabClick('worlds');
+                  else handleTabClick('dashboard');
                 }}
                 className="relative cursor-pointer rounded-xl bg-slate-900/80 p-1 border border-cyan-400/30 hover:border-cyan-400 transition-all shadow-[0_0_15px_rgba(94,242,255,0.2)] flex items-center justify-center overflow-hidden w-11 h-11 shrink-0"
                 title={!isLocked ? "Upload logo" : "Verde Tech Portal"}
@@ -177,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
 
               <div 
-                onClick={() => handleTabClick('worlds')} 
+                onClick={() => handleTabClick('dashboard')} 
                 className="cursor-pointer group flex flex-col"
               >
                 <div className="flex items-center gap-2">
@@ -188,25 +187,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                     2026
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-medium tracking-wide flex items-center gap-1.5">
-                  <span className="text-cyan-400">Future World</span>
-                  <span className="text-slate-600">·</span>
-                  <span>Science · Tech · Innovation</span>
+                <span className="text-[11px] text-slate-400 font-medium tracking-wide">
+                  Sustainability & Eco Portal
                 </span>
               </div>
             </div>
 
-            {/* Desktop Numbered Nav Links (Exact STAI convention) */}
+            {/* Desktop Numbered Nav Links */}
             <nav className="hidden xl:flex items-center gap-1">
               {navLinks.map((link) => {
-                const isActive = activeTab === link.id || (link.id === 'mission' && activeTab === 'dashboard');
+                const isActive = activeTab === link.id;
                 return (
                   <button
                     key={link.id}
                     onClick={() => handleTabClick(link.id)}
-                    className={`stai-nav-link text-xs px-2.5 py-1.5 ${isActive ? 'active' : ''}`}
+                    className={`px-4 py-2 rounded-full font-mono text-xs font-bold transition-all ${
+                      isActive 
+                        ? 'bg-cyan-400 text-slate-950 shadow-[0_0_20px_rgba(94,242,255,0.4)]' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    }`}
                   >
-                    <span className="mono-index">{link.num}</span>
                     <span>{link.label}</span>
                   </button>
                 );
@@ -215,15 +215,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Compact Desktop Navigation for Medium Screens (lg) */}
             <nav className="hidden lg:flex xl:hidden items-center gap-1">
-              {navLinks.slice(0, 5).map((link) => {
-                const isActive = activeTab === link.id || (link.id === 'mission' && activeTab === 'dashboard');
+              {navLinks.map((link) => {
+                const isActive = activeTab === link.id;
                 return (
                   <button
                     key={link.id}
                     onClick={() => handleTabClick(link.id)}
-                    className={`stai-nav-link text-xs px-2 py-1.5 ${isActive ? 'active' : ''}`}
+                    className={`px-3 py-1.5 rounded-full font-mono text-xs font-bold transition-all ${
+                      isActive 
+                        ? 'bg-cyan-400 text-slate-950 shadow-[0_0_20px_rgba(94,242,255,0.4)]' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    }`}
                   >
-                    <span className="mono-index">{link.num}</span>
                     <span>{link.label}</span>
                   </button>
                 );
@@ -233,20 +236,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Action Bar */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
-              {/* Quick Action: Log Activity Button */}
-              <button
-                onClick={() => {
-                  playSound('click');
-                  onOpenLogModal();
-                }}
-                className="btn-stai-outline hidden sm:inline-flex"
-                title="Log Eco Action"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Log Action</span>
-              </button>
 
-              {/* Gift Cards Redeem */}
+              {/* Redeem Code */}
               {onOpenRedeemGiftCards && (
                 <button
                   onClick={() => {
@@ -254,10 +245,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onOpenRedeemGiftCards();
                   }}
                   className="p-2 sm:px-3 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 hover:bg-amber-500/20 transition-colors text-xs font-mono font-bold flex items-center gap-1.5"
-                  title="Redeem Gift Cards"
+                  title="Redeem Code"
                 >
                   <Gift className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden md:inline">Gift Code</span>
+                  <span className="hidden md:inline">Redeem Code</span>
                 </button>
               )}
 
@@ -356,30 +347,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setIsMobileMenuOpen(false);
                   }}
                   className={`flex items-center gap-2 p-2.5 rounded-lg text-xs font-semibold transition-all ${
-                    activeTab === link.id || (link.id === 'mission' && activeTab === 'dashboard')
+                    activeTab === link.id
                       ? 'bg-cyan-500/10 border border-cyan-400/40 text-cyan-300'
                       : 'text-slate-400 hover:text-white bg-slate-900/40'
                   }`}
                 >
-                  <span className="font-mono text-[10px] text-cyan-400">{link.num}</span>
                   <span>{link.label}</span>
                 </button>
               ))}
             </div>
-
-            <div className="flex gap-2 pt-2 border-t border-white/10">
-              <button
-                onClick={() => {
-                  playSound('click');
-                  onOpenLogModal();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex-1 btn-stai-cyan justify-center py-2 text-xs"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>Log Action</span>
-              </button>
-
+            <div className="pt-2 border-t border-white/10">
               {onOpenGate && (
                 <button
                   onClick={() => {
@@ -387,7 +364,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onOpenGate();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="btn-stai-outline text-xs"
+                  className="w-full btn-stai-outline text-xs justify-center"
                 >
                   <span>Launch Gate</span>
                 </button>

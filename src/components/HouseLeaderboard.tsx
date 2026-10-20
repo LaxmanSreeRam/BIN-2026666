@@ -1,20 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Student, ActivityLog } from '../types';
 import { 
   Trophy, 
-  Sparkles, 
-  Zap, 
-  Flame, 
-  Leaf, 
-  ShieldCheck, 
-  Globe2, 
-  Compass, 
-  ChevronRight,
-  TrendingUp,
-  Cpu
+  Sparkles
 } from 'lucide-react';
 import { StudentLeaderboard } from './StudentLeaderboard';
-import { SpinningWheel } from './SpinningWheel';
 
 interface CampusDashboardProps {
   students: Student[];
@@ -32,57 +22,18 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
   logs = [],
   onOpenLogModal,
   onOpenCertificateModal,
-  onUpdateStudent,
 }) => {
   const onlyStudents = students.filter((s) => s.grNo !== 'ADMIN-001');
 
   const totalPoints = onlyStudents.reduce((sum, s) => sum + (s.points || 0), 0);
   const totalCo2 = onlyStudents.reduce((sum, s) => sum + (s.co2SavedKg || 0), 0);
-  const totalWaste = onlyStudents.reduce((sum, s) => sum + (s.wasteDivertedKg || 0), 0);
   const totalDisposals = logs.filter(l => l.status === 'Approved').length;
-
-  const [activePillar, setActivePillar] = useState<'waste' | 'energy' | 'nature' | 'mobility'>('waste');
-
-  const pillars = [
-    {
-      id: 'waste',
-      title: '01 · Circular Waste & Smart Bins',
-      desc: 'Smart IoT telemetry sensors and verified sorting divert campus plastics and e-waste.',
-      icon: '♻️',
-      stat: `${totalWaste.toFixed(0)} kg`,
-      label: 'Waste Diverted'
-    },
-    {
-      id: 'energy',
-      title: '02 · Clean Power & Grid Efficiency',
-      desc: 'Classroom energy audits, vampire load elimination, and solar monitoring in real-time.',
-      icon: '💡',
-      stat: '340 kWh',
-      label: 'Energy Conserved'
-    },
-    {
-      id: 'nature',
-      title: '03 · Campus Ecosystems & Planting',
-      desc: 'Tree sapling care, indigenous flora planting, and soil conservation missions.',
-      icon: '🌱',
-      stat: `${totalCo2.toFixed(1)} kg`,
-      label: 'CO₂ Neutralized'
-    },
-    {
-      id: 'mobility',
-      title: '04 · Low-Carbon Transit & Walkers',
-      desc: 'Pedestrian and cycle commutes tracked with eco bonuses and house credit.',
-      icon: '🚴',
-      stat: '100% Green',
-      label: 'Campus Mobility'
-    }
-  ];
 
   return (
     <div className="space-y-10">
       
       {/* ══════════════════════════════════════════════════════════════
-          STAI FUTURE WORLD HERO SECTION
+          CAMPUS DASHBOARD HERO SECTION
           ══════════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#080c1b]/80 backdrop-blur-2xl p-6 sm:p-10 shadow-2xl">
         
@@ -105,10 +56,10 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
             <div className="flex items-center gap-2">
               <span className="hud-pill">
                 <span className="hud-dot"></span>
-                <span>FUTURE WORLD · 2026</span>
+                <span>VERDE TECH · TELEMETRY</span>
               </span>
-              <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-violet-500/10 border border-violet-400/30 text-violet-300 text-xs font-mono font-medium">
-                ISWK · CAMPUS ECO INNOVATION
+              <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-mono font-medium">
+                COMMUNITY INITIATIVE
               </span>
             </div>
 
@@ -123,11 +74,11 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
           <div className="max-w-4xl space-y-4">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-none font-display">
               WHERE SUSTAINABILITY <br />
-              <span className="stai-gradient-text">BECOMES INVENTION.</span>
+              <span className="stai-gradient-text">BECOMES ACTION.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed max-w-2xl">
-              Enter the Verde Tech Future World — four mission pillars, smart bin telemetry, and verified student actions turning campus climate goals into tangible reality.
+              Smart bin telemetry, verified eco-actions, and sustainable community initiatives turning environmental goals into tangible reality.
             </p>
           </div>
 
@@ -170,10 +121,10 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
             <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
               <div className="text-[11px] font-mono text-violet-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-                <span>Verified Students</span>
+                <span>Active Members</span>
               </div>
               <div className="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-tight tabular-nums">
-                {onlyStudents.length} <span className="text-xs text-slate-400">makers</span>
+                {onlyStudents.length} <span className="text-xs text-slate-400">members</span>
               </div>
             </div>
 
@@ -203,72 +154,16 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
       </section>
 
       {/* ══════════════════════════════════════════════════════════════
-          FOUR WORLDS / PILLARS (Inspired directly by STAI Worlds)
-          ══════════════════════════════════════════════════════════════ */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs font-mono text-cyan-400 tracking-widest uppercase mb-1">
-              [ 01 // SUSTAINABILITY WORLDS ]
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-              Four Worlds of Action
-            </h2>
-          </div>
-          <span className="text-xs font-mono text-slate-400 hidden sm:inline">
-            SELECT A WORLD TO VIEW IMPACT
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {pillars.map((p) => {
-            const isSelected = activePillar === p.id;
-            return (
-              <div
-                key={p.id}
-                onClick={() => setActivePillar(p.id as any)}
-                className={`stai-card p-5 cursor-pointer select-none transition-all ${
-                  isSelected 
-                    ? 'border-cyan-400 shadow-[0_0_30px_rgba(94,242,255,0.2)] bg-[#0d1326]' 
-                    : 'hover:border-white/20'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl">{p.icon}</span>
-                  <span className="font-mono text-xs text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-400/20">
-                    {p.stat}
-                  </span>
-                </div>
-
-                <h3 className="font-bold text-white text-base mb-2 font-display">
-                  {p.title}
-                </h3>
-
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {p.desc}
-                </p>
-
-                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                  <span>{p.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-cyan-400" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          LEADERBOARD SECTION (MAKERS OF CHANGE)
+          LEADERBOARD SECTION (MEMBER RANKINGS)
           ══════════════════════════════════════════════════════════════ */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs font-mono text-violet-400 tracking-widest uppercase mb-1">
-              [ 02 // MAKERS & RANKINGS ]
+              [ 01 // MEMBER RANKINGS ]
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-              Campus Makers Leaderboard
+              Member Eco Leaderboard
             </h2>
           </div>
           <span className="text-xs font-mono text-slate-400 hidden sm:inline">
@@ -281,32 +176,6 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
           currentStudent={currentStudent || null}
           onOpenLogModal={onOpenLogModal || (() => {})}
           onOpenCertificateModal={onOpenCertificateModal}
-        />
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          BONUS WHEEL & MYSTERY CHALLENGES
-          ══════════════════════════════════════════════════════════════ */}
-      <section className="stai-card p-6 sm:p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
-          <div>
-            <div className="text-xs font-mono text-amber-400 tracking-wider uppercase mb-1">
-              [ BONUS LAB PROTOCOL ]
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white font-display flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-400" />
-              <span>Campus Eco Spin & Bonus Grant</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Spin to receive daily eco-actions, multiplier points, and campus house achievements.
-            </p>
-          </div>
-        </div>
-
-        <SpinningWheel
-          currentStudent={currentStudent || null}
-          logs={logs}
-          onUpdateStudent={onUpdateStudent}
         />
       </section>
 

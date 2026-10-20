@@ -112,32 +112,11 @@ export default function App() {
   });
 
   const [currentStudent, setCurrentStudent] = useState<Student | null>(() => {
-    const saved = localStorage.getItem('verdetech_current_student') || localStorage.getItem('ecopoints_current_student');
-    if (saved) {
-      try {
-        const student: Student = JSON.parse(saved);
-        if (student.grNo === 'ECO-835902' || student.grNo === '835902') {
-          student.grNo = '83502';
-        }
-        if (!student.avatarUrl && student.grNo === '83502') {
-          student.avatarUrl = '/laxman_sree_ram.jpg';
-        }
-        return student;
-      } catch (e) {
-        // fallback
-      }
-    }
     return null;
   });
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [showGate, setShowGate] = useState<boolean>(() => {
-    if (typeof sessionStorage !== 'undefined') {
-      const entered = sessionStorage.getItem('verdetech_gate_entered');
-      if (entered === 'true') return false;
-    }
-    return true;
-  });
+  const [showGate, setShowGate] = useState<boolean>(true);
   const [soundEnabled, setSoundState] = useState<boolean>(() => isSoundEnabled());
 
   const handleToggleSound = () => {
@@ -421,6 +400,12 @@ export default function App() {
     localStorage.setItem('verdetech_feed_posts', JSON.stringify(feedPosts));
     localStorage.setItem('ecopoints_feed_posts', JSON.stringify(feedPosts));
   }, [feedPosts]);
+
+  useEffect(() => {
+    // Ensure website load always starts fresh without auto-logging into an account
+    localStorage.removeItem('verdetech_current_student');
+    localStorage.removeItem('ecopoints_current_student');
+  }, []);
 
   useEffect(() => {
     if (currentStudent) {
@@ -760,6 +745,16 @@ export default function App() {
     });
   };
 
+  if (showGate) {
+    return (
+      <GateScreen
+        onEnter={handleEnterGate}
+        soundEnabled={soundEnabled}
+        onToggleSound={handleToggleSound}
+      />
+    );
+  }
+
   if (!currentStudent || !activeStudent) {
     return (
       <>
@@ -1000,19 +995,17 @@ export default function App() {
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#5ef2ff] animate-pulse" />
               <span className="text-white font-bold font-display text-base tracking-wider uppercase">
-                VERDE TECH · FUTURE WORLD 2026
+                VERDE TECH · ECO PORTAL 2026
               </span>
-              <span className="text-slate-600">|</span>
-              <span className="text-cyan-300">ISWK MUSCAT</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-4 text-xs">
-              <span className="text-slate-400">TELEMETRY: 23.59° N · 58.54° E</span>
+              <span className="text-slate-400">TELEMETRY GRID // ACTIVE</span>
               <span className="text-slate-600">•</span>
               <a 
                 href="https://whatsapp.com/channel/0029Vb8TDOm7DAWxqSu3yq0O" 
                 target="_blank" 
-                rel="noopener noreferrer"
+                rel="noopener noreferrer" 
                 className="text-emerald-400 hover:text-white transition-colors flex items-center gap-1.5"
               >
                 <i className="bi bi-whatsapp"></i>
@@ -1083,8 +1076,8 @@ export default function App() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 pt-4 gap-2">
-            <p>© 2026 Indian School Al Wadi Al Kabir · Science · Technology · Innovation (STAI).</p>
-            <p>Verde Tech Campus Sustainability Platform · Engineered for Future World 2026.</p>
+            <p>© 2026 Verde Tech Systems · Science · Technology · Innovation.</p>
+            <p>Verde Tech Sustainability Platform · Environmental Action & Waste Telemetry.</p>
           </div>
 
         </div>

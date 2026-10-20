@@ -8,13 +8,13 @@ import {
   KeyRound, 
   RotateCw,
   Clock,
-  Loader2
+  Loader2,
+  X,
+  Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { db } from '../lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-
-// ... (Rest of the component implementation with Firestore logic)
 
 export interface RecentRedemption {
   id: string;
@@ -89,7 +89,6 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Pleasant Web Audio Chime on successful redemption
   const playRedemptionChime = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -98,70 +97,128 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-      osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.1); // E5
-      osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.25); // C6
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
 
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start();
-      osc.stop(ctx.currentTime + 0.45);
+      osc.stop(ctx.currentTime + 0.4);
     } catch {
-      // Audio not permitted
+      // ignore
     }
   };
 
-  const handleRedeem = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErrorMsg('');
-
+  const handleRedeem = async (e: React.FormEvent) => {
+    e.preventDefault();
     const clean = codeInput.trim().toUpperCase();
-    if (!/^\d{4}$/.test(clean)) {
-      setErrorMsg('Please enter a 4-digit numeric code.');
+    if (!clean) {
+      setErrorMsg('Please enter a valid redeem code.');
       return;
     }
 
-    const studentGr = currentStudent?.grNo || '83502';
-    const studentName = currentStudent?.name || 'Active Student';
+    if (clean === '6930' || clean === '4860') {
+      const pointsAwarded = clean === '6930' ? 15 : 10;
+      const keyDate = `verdetech_code_date_${clean}`;
+      const lastUsedDate = localStorage.getItem(keyDate);
+      const today = new Date().toDateString();
+
+      if (lastUsedDate === today) {
+        setErrorMsg('Code already redeemed for today. Please try again tomorrow!');
+        return;
+      }
+
+      localStorage.setItem(keyDate, today);
+
+      const title = `+${pointsAwarded} Verde Points Credited`;
+      const description = `Verified smart bin redemption reward (${pointsAwarded} points).`;
+
+      playRedemptionChime();
+      try {
+        confetti({
+          particleCount: 75,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#5ef2ff', '#34d399', '#a78bfa', '#fde047'],
+        });
+      } catch {}
+
+      if (onRedeemPoints && currentStudent) {
+        onRedeemPoints(pointsAwarded, title);
+      }
+
+      const newRecent: RecentRedemption = {
+        id: `rec_${Date.now()}`,
+        code: clean,
+        title,
+        pointsAwarded,
+        type: 'points',
+        timestamp: 'Just now',
+      };
+      const updatedRecents = [newRecent, ...recentRedemptions.filter((r) => r.code !== clean)];
+      setRecentRedemptions(updatedRecents);
+      try {
+        localStorage.setItem('verdetech_recent_redemptions', JSON.stringify(updatedRecents));
+      } catch {}
+
+      setSuccessInfo({
+        type: 'points',
+        title,
+        description,
+        pointsAwarded,
+        code: clean,
+      });
+      setCodeInput('');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (redeemedCodes.includes(clean)) {
+      setErrorMsg(`Code "${clean}" has already been redeemed on this device.`);
+      return;
+    }
 
     setIsSubmitting(true);
+    setErrorMsg('');
 
     try {
-      // 1. First attempt to redeem via Backend API & Firebase Firestore (supports Raspberry Pi codes)
-      const apiRes = await fetch('/api/redeem-gift-card', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: clean,
-          grNo: studentGr,
-          studentName,
-        }),
-      });
+      let isFirestoreVerified = false;
+      let apiData: any = null;
 
-      const apiData = await apiRes.json();
+      try {
+        const res = await fetch('/api/verify-gift-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: clean }),
+        });
+        apiData = await res.json();
+      } catch {
+        // Fallback to local offline validation if backend proxy fails
+      }
 
-      if (apiRes.ok && apiData.success) {
-        const pointsAwarded = Number(apiData.pointsAwarded) || 50;
-        const title = `+${pointsAwarded} Verde Points Credited`;
-        const description = `Smart Bin Gift Card ${clean} successfully credited to your account.`;
+      if (apiData && apiData.success) {
+        isFirestoreVerified = true;
+        const pointsAwarded = apiData.points || 50;
+        const title = apiData.title || `+${pointsAwarded} Verde Points Credited`;
+        const description = apiData.description || 'Verified gift card redemption reward.';
 
         playRedemptionChime();
         try {
           confetti({
-            particleCount: 85,
-            spread: 75,
+            particleCount: 75,
+            spread: 70,
             origin: { y: 0.6 },
-            colors: ['#059669', '#10B981', '#F59E0B', '#3B82F6'],
+            colors: ['#5ef2ff', '#34d399', '#a78bfa', '#fde047'],
           });
         } catch {}
 
-        if (onRedeemPoints) {
-          onRedeemPoints(pointsAwarded, `Smart Bin Gift Card (${clean})`);
+        if (onRedeemPoints && currentStudent) {
+          onRedeemPoints(pointsAwarded, title);
         }
 
         const updatedCodes = [...redeemedCodes, clean];
@@ -189,21 +246,17 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
           title,
           description,
           pointsAwarded,
+          code: clean,
         });
         setCodeInput('');
+        setIsSubmitting(false);
         return;
       }
 
-      // If backend says already redeemed
-      if (apiRes.status === 400 && apiData.error) {
-        setErrorMsg(apiData.error);
-        return;
-      }
-
-      // If code was not in database (404), evaluate preset/store voucher patterns
+      // Offline / Preset verification pattern match
       let type: 'points' | 'item' = 'points';
       let pointsAwarded = 50;
-      let title = 'Waste Disposal Reward';
+      let title = 'Eco Disposal Reward';
       let description = 'Verified waste disposal deposit reward.';
 
       if (clean.includes('250') || clean.includes('MEGA') || clean.includes('BONUS')) {
@@ -221,83 +274,53 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
       } else if (clean.includes('SNACK') || clean.includes('CAFE') || clean.includes('FOOD')) {
         type = 'item';
         title = 'Cafeteria Snack Voucher';
-        description = 'Free Organic Snack Voucher redeemable at the cafeteria.';
+        description = 'Free Organic Snack Voucher redeemable at the dining lounge.';
       } else if (clean.includes('PIN') || clean.includes('MERCH') || clean.includes('STORE')) {
         type = 'item';
         title = 'Verde Tech Ambassador Pin';
-        description = 'Official Ambassador Enamel Pin reward redeemable at the eco council desk.';
+        description = 'Official Ambassador Enamel Pin reward redeemable at the support desk.';
       } else if (clean.startsWith('GIFT-') || clean.includes('VOUCHER') || clean.includes('PASS')) {
         type = 'item';
         title = 'Eco Store Voucher Pass';
         description = 'Verified disposal reward voucher pass redeemable at the Rewards Store.';
       } else {
-        setErrorMsg(apiData.error || `Invalid gift code "${clean}". No active Gift Card found in database.`);
+        setErrorMsg(`Invalid gift code "${clean}". No active Gift Card found in portal database.`);
+        setIsSubmitting(false);
         return;
       }
 
-      // Trigger celebration
       playRedemptionChime();
       try {
         confetti({
           particleCount: 85,
           spread: 75,
           origin: { y: 0.6 },
-          colors: ['#059669', '#10B981', '#F59E0B', '#3B82F6'],
+          colors: ['#5ef2ff', '#34d399', '#a78bfa', '#fde047'],
         });
       } catch {}
 
       if (type === 'points') {
-        if (onRedeemPoints) {
-          onRedeemPoints(pointsAwarded, `Gift Code Redemption (${clean})`);
-        }
-        if (onSubmitActivity) {
-          const newLog: ActivityLog = {
-            id: `log-gift-${Date.now()}`,
-            grNo: studentGr,
-            studentName,
-            challengeId: 'challenge-gift-code',
-            challengeTitle: `Gift Code (${clean})`,
-            category: 'Recycling',
-            quantity: 1,
-            unitLabel: 'Disposal',
-            pointsEarned: pointsAwarded,
-            co2SavedKg: 0.45,
-            waterSavedLiters: 1.2,
-            wasteDivertedKg: 0.35,
-            energySavedKwh: 0.8,
-            status: 'Approved',
-            timestamp: new Date().toISOString(),
-            proofNote: `Redeemed disposal gift code ${clean} on Verde Tech Portal.`,
-            cheersCount: 0,
-            reactions: { cheer: 0, fire: 0, leaf: 0 },
-          };
-          onSubmitActivity(newLog);
+        if (onRedeemPoints && currentStudent) {
+          onRedeemPoints(pointsAwarded, title);
         }
       } else {
-        const newReward: RedeemedReward = {
-          id: `red_gift_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-          rewardId: `gift-${clean}`,
+        const studentGr = currentStudent ? currentStudent.grNo : '83502';
+        const studentName = currentStudent ? currentStudent.name : 'Active Member';
+        const newRewardItem: RedeemedReward = {
+          id: 'rew_red_' + Date.now(),
+          rewardId: 'gift_code_' + clean.toLowerCase(),
           rewardTitle: title,
           pointsSpent: 0,
           redeemedAt: new Date().toISOString(),
           redemptionCode: clean,
+          status: 'Active',
           studentGrNo: studentGr,
           studentName,
-          status: 'Active',
         };
-        try {
-          const saved = localStorage.getItem('verdetech_redemptions') || localStorage.getItem('ecopoints_redemptions');
-          const list = saved ? JSON.parse(saved) : [];
-          list.unshift(newReward);
-          localStorage.setItem('verdetech_redemptions', JSON.stringify(list));
-          localStorage.setItem('ecopoints_redemptions', JSON.stringify(list));
-        } catch (e) {
-          console.warn('Could not save redeemed reward to localStorage', e);
-        }
         if (onRedeemRewardItem) {
-          onRedeemRewardItem(newReward);
+          onRedeemRewardItem(newRewardItem);
         }
-        if (onSubmitActivity) {
+        if (onSubmitActivity && currentStudent) {
           const newLog: ActivityLog = {
             id: `log-gift-item-${Date.now()}`,
             grNo: studentGr,
@@ -336,7 +359,7 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
         type,
         timestamp: 'Just now',
       };
-      const updatedRecents = [newRecent, ...recentRedemptions.filter(r => r.code !== clean)];
+      const updatedRecents = [newRecent, ...recentRedemptions.filter((r) => r.code !== clean)];
       setRecentRedemptions(updatedRecents);
       try {
         localStorage.setItem('verdetech_recent_redemptions', JSON.stringify(updatedRecents));
@@ -347,6 +370,7 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
         title,
         description,
         pointsAwarded: type === 'points' ? pointsAwarded : undefined,
+        code: clean,
       });
       setCodeInput('');
     } catch (err: any) {
@@ -357,215 +381,204 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
   };
 
   return (
-    <div
-      className="modal show d-block"
-      tabIndex={-1}
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1060 }}
-    >
-      <div className="modal-dialog modal-md modal-dialog-centered">
-        <div className="modal-content border border-4 border-dark rounded-0 shadow-[8px_8px_0px_0px_black] bg-white">
-          
-          {/* Header Bar - Corporate Eco Green */}
-          <div className="modal-header bg-success text-white border-bottom border-dark border-3 rounded-0 px-4 py-3">
-            <div className="d-flex align-items-center gap-3">
-              <div className="p-2.5 bg-dark text-warning rounded-0 border border-2 border-dark">
-                <Gift className="w-6 h-6" />
-              </div>
-              <div>
-                <h5 className="modal-title fw-black text-uppercase tracking-tight m-0">
-                  REDEEM GIFT CARDS
-                </h5>
-                <p className="text-white-50 small m-0 mt-0.5">
-                  Enter your verification code to claim points or store rewards
-                </p>
-              </div>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="w-full max-w-lg bg-[#0a0f24] border border-cyan-400/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(94,242,255,0.2)] animate-scaleUp">
+        
+        {/* Modal Header */}
+        <div className="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
+              <Gift className="w-5 h-5 animate-pulse" />
             </div>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-close btn-close-white rounded-0"
-              aria-label="Close"
-            />
+            <div>
+              <h4 className="text-lg font-bold font-display text-white">
+                REDEEM CODES
+              </h4>
+              <p className="text-xs font-mono text-slate-400 mt-0.5">
+                Enter your voucher code to claim points or store rewards
+              </p>
+            </div>
           </div>
 
-          <div className="modal-body p-4 bg-light">
-            
-            {/* SUCCESS BANNER */}
-            {successInfo ? (
-              <div className="card border border-3 border-dark rounded-0 bg-white p-4 shadow-[4px_4px_0px_0px_black] text-center">
-                <div className="p-3 bg-dark text-success rounded-0 border border-2 border-dark d-inline-flex mx-auto mb-3">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
-                
-                <span className="badge bg-success text-white rounded-0 fw-black text-uppercase px-3 py-1 small mb-2 d-inline-block">
-                  ★ Code Successfully Redeemed! ★
-                </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-slate-400 hover:text-white transition-colors p-1 rounded-lg bg-white/5 hover:bg-white/10"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-                <h4 className="fw-black text-dark text-uppercase m-0">
-                  {successInfo.title}
-                </h4>
+        {/* Modal Body */}
+        <div className="space-y-6">
+          
+          {/* SUCCESS BANNER */}
+          {successInfo ? (
+            <div className="stai-card p-6 text-center space-y-4 bg-gradient-to-b from-cyan-950/30 to-black/60">
+              <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto animate-bounce" />
+              
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 font-mono text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Code Successfully Claimed</span>
+              </span>
 
-                <p className="text-muted small mt-1 mb-3">
-                  {successInfo.description}
-                </p>
+              <h4 className="text-xl font-bold font-display text-white">
+                {successInfo.title}
+              </h4>
 
-                <div className="p-3 bg-light border border-2 border-dark rounded-0 d-inline-block mx-auto mb-4 font-monospace">
-                  <span className="text-muted xsmall d-block fw-bold">STATUS</span>
-                  <span className="fs-5 fw-black text-dark">CLAIMED</span>
-                </div>
+              <p className="text-xs sm:text-sm text-slate-300">
+                {successInfo.description}
+              </p>
 
-                <div className="d-flex justify-content-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSuccessInfo(null)}
-                    className="btn btn-outline-dark rounded-0 fw-bold border-2 px-3 py-2"
-                  >
-                    <RotateCw className="w-4 h-4 me-1.5 inline" />
-                    Redeem Another Code
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="btn btn-success text-white rounded-0 fw-black text-uppercase border border-2 border-dark px-4 py-2 shadow-[2px_2px_0px_0px_black]"
-                  >
-                    Done
-                  </button>
-                </div>
+              <div className="p-3.5 rounded-xl bg-black/60 border border-cyan-400/40 font-mono">
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-1">Voucher Code</span>
+                <span className="text-lg font-bold text-cyan-300">{successInfo.code}</span>
               </div>
-            ) : (
-              /* REDEMPTION INPUT FORM */
-              <div className="card bg-white border border-3 border-dark rounded-0 p-4 shadow-[4px_4px_0px_0px_black]">
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                  <h6 className="fw-black text-dark text-uppercase m-0 d-flex align-items-center gap-2">
-                    <KeyRound className="w-5 h-5 text-warning" />
-                    <span>Enter Voucher / Gift Code</span>
-                  </h6>
-                  <span className="badge bg-dark text-white rounded-0 font-monospace small">
-                    PORTAL VERIFIED
-                  </span>
-                </div>
 
-                {errorMsg && (
-                  <div className="alert alert-danger rounded-0 border border-2 border-dark text-dark fw-bold small py-2 d-flex align-items-center gap-2 mb-3">
-                    <AlertCircle className="w-4 h-4 text-danger flex-shrink-0" />
-                    <span>{errorMsg}</span>
-                  </div>
-                )}
-
-                <form onSubmit={handleRedeem}>
-                  <div className="input-group mb-3">
-                    <span className="input-group-text bg-light rounded-0 border-2 border-dark">
-                      <Gift className="w-5 h-5 text-dark" />
-                    </span>
-                    <input
-                      type="text"
-                      required
-                      autoFocus
-                      disabled={isSubmitting}
-                      value={codeInput}
-                      onChange={(e) => {
-                        setCodeInput(e.target.value.toUpperCase());
-                        setErrorMsg('');
-                      }}
-                      placeholder="e.g. 6930, BIN-50PTS, or GIFT-REWARD"
-                      className="form-control rounded-0 border-2 border-dark fw-black font-monospace py-2.5 fs-5 text-uppercase"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="btn btn-success text-white fw-black text-uppercase rounded-0 border border-2 border-dark px-4 py-2.5 shadow-[2px_2px_0px_0px_black] d-flex align-items-center gap-1.5"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Verifying...</span>
-                        </>
-                      ) : (
-                        <span>Redeem Now</span>
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="d-flex align-items-center gap-1.5 text-success small fw-bold mb-2">
-                    <span>Verde Tech Gift Code System</span>
-                  </div>
-
-                  <div className="d-flex flex-wrap align-items-center justify-content-between text-muted small pt-1 border-top border-dark border-opacity-10">
-                    <span>
-                      Credited to: <strong>{currentStudent?.name || 'Active Student'}</strong> ({currentStudent?.grNo || '83502'})
-                    </span>
-                    <span className="font-monospace">Points or Store Vouchers</span>
-                  </div>
-                </form>
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSuccessInfo(null)}
+                  className="flex-1 py-2.5 rounded-full border border-white/10 text-slate-300 hover:bg-white/5 font-mono text-xs transition-colors"
+                >
+                  <RotateCw className="w-3.5 h-3.5 inline mr-1.5" />
+                  Redeem Another
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 btn-stai-cyan justify-center py-2.5 text-xs font-bold uppercase"
+                >
+                  Done
+                </button>
               </div>
-            )}
-
-            {/* RECENT REDEMPTIONS SUMMARY LIST */}
-            <div className="mt-4 pt-3 border-top border-dark border-2">
-              <div className="d-flex align-items-center justify-content-between mb-2">
-                <h6 className="fw-black text-dark text-uppercase m-0 d-flex align-items-center gap-2 small">
-                  <Clock className="w-4 h-4 text-success" />
-                  <span>Recent Redemptions</span>
-                </h6>
-                <span className="badge bg-dark text-white rounded-0 font-monospace small px-2 py-0.5">
-                  {recentRedemptions.length} Claimed
+            </div>
+          ) : (
+            /* REDEMPTION INPUT FORM */
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>Enter Redeem Code</span>
+                </label>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-cyan-950/60 text-cyan-400 border border-cyan-400/30">
+                  PORTAL SECURE
                 </span>
               </div>
 
-              {recentRedemptions.length === 0 ? (
-                <div className="p-3 bg-white border border-2 border-dark rounded-0 text-center text-muted small">
-                  <span>No recent gift codes redeemed yet. Enter your disposal code above.</span>
-                </div>
-              ) : (
-                <div className="bg-white border border-2 border-dark rounded-0 overflow-hidden shadow-[2px_2px_0px_0px_black]">
-                  {recentRedemptions.slice(0, 5).map((item, idx) => (
-                    <div 
-                      key={item.id} 
-                      className={`p-2.5 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2 text-dark small ${
-                        idx !== recentRedemptions.slice(0, 5).length - 1 ? 'border-bottom border-secondary border-opacity-25' : ''
-                      }`}
-                    >
-                      <div className="d-flex align-items-center gap-2">
-                        <span className="fw-bold">{item.title}</span>
-                      </div>
-                      <div className="d-flex align-items-center gap-2">
-                        {item.type === 'points' && item.pointsAwarded ? (
-                          <span className="badge bg-success text-white rounded-0 fw-black">
-                            +{item.pointsAwarded} Pts
-                          </span>
-                        ) : (
-                          <span className="badge bg-warning text-dark rounded-0 fw-bold border border-dark">
-                            Reward Perk
-                          </span>
-                        )}
-                        <span className="text-muted xsmall font-monospace">{item.timestamp}</span>
-                      </div>
-                    </div>
-                  ))}
+              {errorMsg && (
+                <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs flex items-center gap-2 animate-fadeIn">
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  <span>{errorMsg}</span>
                 </div>
               )}
+
+              <form onSubmit={handleRedeem} className="space-y-4">
+                <div className="relative">
+                  <Gift className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    disabled={isSubmitting}
+                    value={codeInput}
+                    onChange={(e) => {
+                      setCodeInput(e.target.value.toUpperCase());
+                      setErrorMsg('');
+                    }}
+                    placeholder="e.g. 6930, BIN-50PTS, or GIFT-REWARD"
+                    className="w-full bg-black/60 border border-white/15 focus:border-cyan-400 rounded-xl pl-10 pr-4 py-3 text-sm font-mono font-bold text-white placeholder-slate-500 outline-none uppercase transition-colors"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full btn-stai-cyan justify-center py-3 text-xs font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(94,242,255,0.3)]"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Verifying Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Redeem Code</span>
+                        <Gift className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-2 border-t border-white/10">
+                  <span>Credited to: <strong className="text-white">{currentStudent?.name || 'Active Member'}</strong></span>
+                  <span className="text-cyan-400">Points & Store Perks</span>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* RECENT REDEMPTIONS LIST */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Recent Redemptions</span>
+              </span>
+              <span className="text-[11px] font-mono text-cyan-400">
+                {recentRedemptions.length} Claimed
+              </span>
             </div>
 
-          </div>
-
-          {/* Modal Footer */}
-          <div className="modal-footer bg-white border-top border-dark border-3 px-4 py-3 d-flex align-items-center justify-content-between">
-            <span className="small text-muted d-flex align-items-center gap-1.5 fw-bold">
-              <ShieldCheck className="w-4 h-4 text-success" />
-              <span>Verde Tech Official Gift Verification Protocol</span>
-            </span>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-outline-dark rounded-0 fw-bold border-2 px-3 py-1.5"
-            >
-              Close
-            </button>
+            {recentRedemptions.length === 0 ? (
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center text-xs font-mono text-slate-500">
+                No gift codes redeemed yet. Enter your code above.
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
+                {recentRedemptions.slice(0, 5).map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-xs font-mono"
+                  >
+                    <span className="font-bold text-white truncate max-w-[200px]">{item.title}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {item.type === 'points' && item.pointsAwarded ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-400/20">
+                          +{item.pointsAwarded} PTS
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-400/20">
+                          Reward Perk
+                        </span>
+                      )}
+                      <span className="text-[10px] text-slate-500">{item.timestamp}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>
+
+        {/* Modal Footer */}
+        <div className="flex items-center justify-between pt-4 mt-6 border-t border-white/10 text-[11px] font-mono text-slate-500">
+          <span className="flex items-center gap-1.5 text-emerald-400">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Verde Tech Secured</span>
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-slate-400 hover:text-white transition-colors"
+          >
+            Close Window
+          </button>
+        </div>
+
       </div>
     </div>
   );

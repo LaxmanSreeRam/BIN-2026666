@@ -107,7 +107,7 @@ export const BuildTheFutureVote: React.FC<BuildTheFutureVoteProps> = ({
             <span className="uppercase tracking-widest">Build the Future</span>
           </div>
           <h2 className="text-3xl font-extrabold font-display text-white tracking-tight">
-            Which invention should <span className="stai-gradient-text">ISWK build next?</span>
+            Which invention should <span className="stai-gradient-text">Verde Tech build next?</span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
             Cast your student vote for the next green technology deployment on campus. Winning ideas receive funding from the STAI 2026 Innovation Fund.

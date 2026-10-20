@@ -210,7 +210,7 @@ export const StudentLeaderboard: React.FC<StudentLeaderboardProps> = ({
             <thead className="bg-black/50 border-b border-white/10 font-mono text-[11px] text-slate-400 uppercase tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Rank</th>
-                <th className="py-3.5 px-4">Student Maker</th>
+                <th className="py-3.5 px-4">Contributor</th>
                 <th className="py-3.5 px-4 hidden md:table-cell">Handle</th>
                 <th className="py-3.5 px-4 hidden sm:table-cell">Grade / Role</th>
                 <th className="py-3.5 px-4 hidden lg:table-cell">Badges</th>

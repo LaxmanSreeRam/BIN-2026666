@@ -38,7 +38,7 @@ const SIMULATOR_ITEMS: ItemCase[] = [
     icon: '🍾',
     hint: 'Must be empty, rinsed, and uncrushed for optical sensor classification.',
     correctBin: 'smart-plastic',
-    explanation: 'Optical sensors detect PET #1. The cap and bottle are shredded into 3D printer filament at ISWK Lab.',
+    explanation: 'Optical sensors detect PET #1. The cap and bottle are shredded into 3D printer filament at the campus maker lab.',
     ecoPts: 15
   },
   {
@@ -58,7 +58,7 @@ const SIMULATOR_ITEMS: ItemCase[] = [
     icon: '🍌',
     hint: 'Decomposes in 3-4 weeks under aerobic bacteria cultures.',
     correctBin: 'compost',
-    explanation: 'Fed directly to the ISWK campus vermicompost bins, producing organic soil for tree saplings.',
+    explanation: 'Fed directly to campus vermicompost bins, producing organic soil for tree saplings.',
     ecoPts: 10
   },
   {

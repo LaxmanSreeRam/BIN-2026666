@@ -33,11 +33,11 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
 
           <h1 className="text-3xl sm:text-5xl font-extrabold font-display text-white tracking-tight leading-tight">
             About Verde Tech <br />
-            <span className="stai-gradient-text">Future World Portal</span>
+            <span className="stai-gradient-text">Eco Innovation Portal</span>
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            The Verde Tech Portal is our school's official sustainability tracking and eco-innovation platform designed to inspire, measure, and reward verified environmental actions. From optical smart bin recycling to solar efficiency and classroom audits, every positive action powers campus progress toward STAI 2026.
+            The Verde Tech Portal is an environmental tracking and eco-innovation platform designed to inspire, measure, and reward verified sustainability actions. From optical smart bin recycling to solar efficiency and energy audits, every positive action powers verifiable community progress toward sustainability.
           </p>
 
           <div className="pt-2 flex flex-wrap gap-3">
@@ -70,9 +70,9 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
               <Megaphone className="w-3.5 h-3.5" />
               <span>Official Channels</span>
             </div>
-            <h2 className="text-2xl font-bold font-display text-white">Follow ISWK Verde Tech</h2>
+            <h2 className="text-2xl font-bold font-display text-white">Follow Verde Tech</h2>
             <p className="text-slate-400 text-xs sm:text-sm mt-1">
-              Connect with Verde Tech across official social channels for live campus updates, competition notices, and eco highlights.
+              Connect with Verde Tech across official social channels for live updates, competition notices, and eco highlights.
             </p>
           </div>
 

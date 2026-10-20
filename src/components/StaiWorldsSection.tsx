@@ -54,7 +54,7 @@ export const StaiWorldsSection: React.FC<StaiWorldsSectionProps> = ({
       accent: '#7dff8a',
       icon: TreePine,
       stats: '450+ kg CO₂ Diverted',
-      application: 'Micro-climate sensors logging humidity, heat islands, and tree canopy impact across ISWK.',
+      application: 'Micro-climate sensors logging humidity, heat islands, and tree canopy impact across campus.',
       actionPrompt: 'Planting & biodiversity logs'
     },
     {
@@ -87,7 +87,7 @@ export const StaiWorldsSection: React.FC<StaiWorldsSectionProps> = ({
       accent: '#9d7bff',
       icon: Rocket,
       stats: 'Satellite Earth Telemetry',
-      application: 'Using Copernicus satellite indices to study desert greening and coastal waters around Muscat.',
+      application: 'Using Copernicus satellite indices to study desert greening and coastal waters.',
       actionPrompt: 'Explore satellite data'
     }
   ];
@@ -108,7 +108,7 @@ export const StaiWorldsSection: React.FC<StaiWorldsSectionProps> = ({
             The future is <span className="stai-gradient-text">not one thing.</span>
           </h2>
           <p className="text-sm text-slate-400 max-w-xl mt-1">
-            From artificial intelligence to space exploration, from biotechnology to sustainable cities — enter the six worlds shaping campus innovation at ISWK.
+            From artificial intelligence to space exploration, from biotechnology to sustainable cities — enter the six worlds shaping campus innovation at Verde Tech.
           </p>
         </div>
 
@@ -254,7 +254,7 @@ export const StaiWorldsSection: React.FC<StaiWorldsSectionProps> = ({
               </div>
               <div className="flex justify-between text-slate-300">
                 <span>Sector Authority:</span>
-                <span className="font-mono text-cyan-300">ISWK Eco Council</span>
+                <span className="font-mono text-cyan-300">Verde Tech Eco Council</span>
               </div>
               <div className="flex justify-between text-slate-300">
                 <span>Student Builders:</span>

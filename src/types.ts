@@ -100,7 +100,7 @@ export interface Badge {
   color: string;
 }
 
-export type RewardCategory = 'Campus Perk' | 'Eco Merchandise' | 'School Supplies' | 'Recognition' | 'Voucher';
+export type RewardCategory = 'Eco Perk' | 'Campus Perk' | 'Eco Merchandise' | 'School Supplies' | 'Green Essentials' | 'Recognition' | 'Voucher';
 
 export interface Reward {
   id: string;
