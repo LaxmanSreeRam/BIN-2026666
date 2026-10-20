@@ -1,7 +1,10 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, setLogLevel, doc, getDocFromServer } from 'firebase/firestore';
 import localConfig from '../../firebase-applet-config.json';
+
+// Silence benign internal gRPC stream reconnection notices from Firestore
+setLogLevel('silent');
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || localConfig.apiKey,
@@ -22,7 +25,13 @@ const app = initializeApp({
   appId: firebaseConfig.appId,
 });
 
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = initializeFirestore(
+  app,
+  {
+    experimentalAutoDetectLongPolling: true,
+  },
+  firebaseConfig.firestoreDatabaseId
+);
 export const auth = getAuth(app);
 
 export enum OperationType {

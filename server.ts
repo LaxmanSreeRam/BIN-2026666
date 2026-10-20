@@ -5,7 +5,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import nodemailer from 'nodemailer';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot, increment } from 'firebase/firestore';
+import { initializeFirestore, setLogLevel, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot, increment } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
 
 export type MailPurpose = 'support' | 'credentials' | 'verify';
@@ -271,8 +271,15 @@ interface StoredVerification {
 const verificationCodes = new Map<string, StoredVerification>();
 
 // Initialize Firebase for backend persistence
+setLogLevel('silent');
 const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+const db = initializeFirestore(
+  firebaseApp,
+  {
+    experimentalAutoDetectLongPolling: true,
+  },
+  firebaseConfig.firestoreDatabaseId
+);
 
 // Fast in-memory cache for Raspberry Pi & Smart Bin queries
 const studentsCache = new Map<string, any>();
