@@ -609,8 +609,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                         <span>Static Host Active (verdetech.systems)</span>
                       </div>
                       <p className="text-[11px] text-amber-200/90 leading-relaxed">
-                        This site is hosted on GitHub Pages (static file host without Node.js backend). Your verification code is synchronized directly via Firestore. Please enter it manually below:
+                        This site is hosted on GitHub Pages (static file host without Node.js backend). Your verification code is synchronized directly via Firestore:
                       </p>
+                      {expectedCode && (
+                        <div className="flex justify-center p-2.5 bg-black/60 rounded-lg border border-amber-400/30">
+                          <span className="font-mono text-xl font-black tracking-widest text-amber-300">
+                            {expectedCode}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-400/40 text-cyan-200 text-xs space-y-1">
