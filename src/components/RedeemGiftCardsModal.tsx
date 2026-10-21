@@ -123,8 +123,20 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
       return;
     }
 
-    if (clean === '6930' || clean === '4860') {
+    if (clean === '6930' || clean === '4890') {
       const pointsAwarded = clean === '6930' ? 15 : 10;
+
+      const lastRedeemTime = localStorage.getItem('verdetech_last_redeem_time');
+      const now = Date.now();
+      if (lastRedeemTime) {
+        const elapsed = now - Number(lastRedeemTime);
+        const cooldown = 2 * 60 * 1000; // 2 minutes
+        if (elapsed < cooldown) {
+          setErrorMsg('Please wait a moment before trying another code.');
+          return;
+        }
+      }
+
       const keyDate = `verdetech_code_date_${clean}`;
       const lastUsedDate = localStorage.getItem(keyDate);
       const today = new Date().toDateString();
@@ -135,6 +147,7 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
       }
 
       localStorage.setItem(keyDate, today);
+      localStorage.setItem('verdetech_last_redeem_time', String(now));
 
       const title = `+${pointsAwarded} Verde Points Credited`;
       const description = `Verified smart bin redemption reward (${pointsAwarded} points).`;
