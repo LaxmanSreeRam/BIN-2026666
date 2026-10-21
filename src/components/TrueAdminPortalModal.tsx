@@ -600,13 +600,22 @@ export const TrueAdminPortalModal: React.FC<TrueAdminPortalModalProps> = ({
                         if (confirm('Are you absolutely sure you want to reset all user points to zero? This action is irreversible.')) {
                           setLoading(true);
                           try {
-                            const studentList = students || [];
-                            for (const s of studentList) {
-                              await saveStudentToFirestore({ ...s, points: 0, weeklyPoints: 0 });
+                            const res = await fetch(getApiUrl('/api/admin/reset-all-points'), {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                            });
+                            const data = await res.json();
+                            if (res.ok && data.success) {
+                              const studentList = students || [];
+                              for (const s of studentList) {
+                                await saveStudentToFirestore({ ...s, points: 0, weeklyPoints: 0 });
+                              }
+                              alert(data.message || 'All user points have been reset to zero.');
+                            } else {
+                              throw new Error(data.error || 'Server error');
                             }
-                            alert('All user points have been reset to zero.');
-                          } catch (err) {
-                            alert('Failed to reset points.');
+                          } catch (err: any) {
+                            alert('Failed to reset points: ' + (err?.message || 'Unknown error'));
                           } finally {
                             setLoading(false);
                           }

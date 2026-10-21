@@ -1410,6 +1410,32 @@ Please cross-check with your physical/smart bin records and award points to the 
     }
   });
 
+  // Admin endpoint to reset all student points to 0
+  app.post('/api/admin/reset-all-points', async (req, res) => {
+    try {
+      const snap = await getDocs(collection(db, 'students'));
+      let count = 0;
+      for (const docSnap of snap.docs) {
+        const studentRef = doc(db, 'students', docSnap.id);
+        await updateDoc(studentRef, {
+          points: 0,
+          weeklyPoints: 0,
+          co2SavedKg: 0,
+          waterSavedLiters: 0,
+          wasteDivertedKg: 0,
+          energySavedKwh: 0,
+          updatedAt: new Date().toISOString()
+        });
+        count++;
+      }
+      console.log(`[ADMIN] Reset points to 0 for ${count} students.`);
+      return res.json({ success: true, message: `Successfully reset points to 0 for ${count} students.` });
+    } catch (e: any) {
+      console.error('[ADMIN] Reset points error:', e);
+      return res.status(500).json({ success: false, error: e?.message || 'Failed to reset points' });
+    }
+  });
+
   // 3. POST endpoint for website users to redeem the code and receive points
   app.post('/api/redeem-gift-card', async (req, res) => {
     try {
