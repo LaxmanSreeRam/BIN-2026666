@@ -192,19 +192,28 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
       let apiData: any = null;
 
       try {
-        const res = await fetch(getApiUrl('/api/verify-gift-code'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: clean }),
-        });
-        apiData = await res.json();
+        const res = await fetch(getApiUrl('/api/redeem-gift-card'), {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    code: clean,
+    grNo: currentStudent?.grNo,
+    studentName: currentStudent?.name,
+  }),
+});
+
+const apiData = await res.json();
+
+if (!res.ok || !apiData.success) {
+  throw new Error(apiData.error || 'Code redemption failed.');
+}
       } catch {
         // Fallback to local offline validation if backend proxy fails
       }
 
       if (apiData && apiData.success) {
         isFirestoreVerified = true;
-        const pointsAwarded = apiData.points || 50;
+        const pointsAwarded = Number(apiData.pointsAwarded);
         const title = apiData.title || `+${pointsAwarded} Verde Points Credited`;
         const description = apiData.description || 'Verified gift card redemption reward.';
 
