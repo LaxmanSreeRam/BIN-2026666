@@ -12,6 +12,7 @@ import {
   Shield
 } from 'lucide-react';
 import { EcoAuthBanner } from './EcoAuthBanner';
+import { SocialAuthButtons } from './SocialAuthButtons';
 
 interface SimpleLoginProps {
   students: Student[];
@@ -141,6 +142,16 @@ export const SimpleLogin: React.FC<SimpleLoginProps> = ({
 
               {/* Login Form */}
               <form onSubmit={handleLogin} className="space-y-4">
+                <SocialAuthButtons 
+                  onSuccess={(user) => {
+                    const student = students.find(s => s.email === user.email);
+                    if (student) onLogin(student);
+                    else setErrorMsg('Account not found for this social email. Please register first.');
+                  }}
+                  onError={setErrorMsg}
+                  setIsLoading={setIsLoading}
+                />
+                <div className="text-center text-slate-500 text-xs mb-3">— OR SIGN IN WITH EMAIL —</div>
                 <div>
                   <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
                     Email Address or Username

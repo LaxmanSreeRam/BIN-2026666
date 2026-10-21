@@ -20,10 +20,11 @@ import {
   Loader2
 } from 'lucide-react';
 import { EcoAuthBanner } from './EcoAuthBanner';
+import { SocialAuthButtons } from './SocialAuthButtons';
 import { getApiUrl, isStaticHost } from '../utils/apiConfig';
 import { db, auth } from '../lib/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -51,7 +52,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [step, setStep] = useState<'form' | 'verify' | 'username'>('form');
   const [verificationCode, setVerificationCode] = useState('');
   const [expectedCode, setExpectedCode] = useState('');
-  const [isStaticFallback] = useState(isStaticHost());
+const [isStaticFallback, setIsStaticFallback] =
+  useState(isStaticHost());
 
   // Reliable code fetch for static host
   useEffect(() => {
@@ -170,25 +172,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     }
   };
 
-  const handleGoogleRegister = async () => {
-    setIsLoading(true);
-    setErrorMsg('');
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      // Update email/name inputs with user data
-      setEmailInput(user.email || '');
-      setNameInput(user.displayName || '');
-      setStep('username');
-    } catch (e: any) {
-      console.error('Google login error:', e);
-      setErrorMsg('Google login failed. Please ensure Google provider is enabled in Firebase Console.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleResendCode = async () => {
     setIsResending(true);
@@ -745,14 +728,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               ) : (
                 /* Step 1: Registration Form */
                 <form onSubmit={handleProceedToVerification} className="space-y-3.5">
-                  <button
-                    type="button"
-                    onClick={handleGoogleRegister}
-                    className="w-full bg-white text-black font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors mb-3"
-                  >
-                    <span>Register with Google</span>
-                  </button>
-                  <div className="text-center text-slate-500 text-xs mb-3">— OR —</div>
+                  <SocialAuthButtons
+                    onSuccess={(user) => {
+                      setEmailInput(user.email || '');
+                      setNameInput(user.displayName || '');
+                      setStep('username');
+                    }}
+                    onError={setErrorMsg}
+                    setIsLoading={setIsLoading}
+                  />
+                  <div className="text-center text-slate-500 text-xs mb-3">— OR REGISTER WITH EMAIL —</div>
                   <div>
                     <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
                       Full Name *
