@@ -124,33 +124,25 @@ export const RedeemGiftCardsModal: React.FC<RedeemGiftCardsModalProps> = ({
     }
 
     if (clean === '6930' || clean === '4890') {
-      const pointsAwarded = clean === '6930' ? 15 : 10;
-
       const lastRedeemTime = localStorage.getItem('verdetech_last_redeem_time');
       const now = Date.now();
       if (lastRedeemTime) {
         const elapsed = now - Number(lastRedeemTime);
-        const cooldown = 2 * 60 * 1000; // 2 minutes
+        const cooldown = 20 * 1000; // 20 seconds
         if (elapsed < cooldown) {
-          setErrorMsg('Please wait a moment before trying another code.');
+          setErrorMsg('Please wait a moment.');
           return;
         }
       }
 
-      const keyDate = `verdetech_code_date_${clean}`;
-      const lastUsedDate = localStorage.getItem(keyDate);
-      const today = new Date().toDateString();
-
-      if (lastUsedDate === today) {
-        setErrorMsg('Code already redeemed for today. Please try again tomorrow!');
-        return;
-      }
-
-      localStorage.setItem(keyDate, today);
       localStorage.setItem('verdetech_last_redeem_time', String(now));
 
-      const title = `+${pointsAwarded} Verde Points Credited`;
-      const description = `Verified smart bin redemption reward (${pointsAwarded} points).`;
+      const isRecyclable = clean === '6930';
+      const pointsAwarded = isRecyclable ? 15 : 10;
+      const title = isRecyclable ? '+15 Verde Points (Recyclable Waste)' : '+10 Verde Points (Biodegradable Waste)';
+      const description = isRecyclable
+        ? 'Verified Recyclable Waste Disposal reward (+15 pts).'
+        : 'Verified Biodegradable Waste Disposal reward (+10 pts).';
 
       playRedemptionChime();
       try {

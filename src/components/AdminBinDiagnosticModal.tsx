@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { 
   Shield, 
   Lock, 
@@ -39,44 +41,18 @@ export const AdminBinDiagnosticModal: React.FC<AdminBinDiagnosticModalProps> = (
   const [staffIdError, setStaffIdError] = useState<boolean>(false);
 
   // Simulated IoT Bin States
-  const [bins, setBins] = useState([
-    {
-      id: 'BIN-001',
-      location: 'Main Campus Entrance',
-      fillLevel: 84, // %
-      isFull: false,
-      status: 'Near Full / Action Recommended',
-      condition: 'Intact & Weatherproof',
-      battery: '12.4V (94%)',
-      temperature: '38.5°C',
-      rssi: '-62 dBm',
-      lastPing: 'Live (10s ago)',
-    },
-    {
-      id: 'BIN-002',
-      location: 'Science Lab Quad',
-      fillLevel: 32, // %
-      isFull: false,
-      status: 'Optimal / Normal',
-      condition: 'Intact & Clean',
-      battery: '12.7V (98%)',
-      temperature: '36.2°C',
-      rssi: '-58 dBm',
-      lastPing: 'Live (4s ago)',
-    },
-    {
-      id: 'BIN-003',
-      location: 'Cafeteria Hallway',
-      fillLevel: 97, // %
-      isFull: true,
-      status: '🚨 FULL - COLLECTION REQUIRED',
-      condition: 'Intact (High Volume)',
-      battery: '11.9V (82%)',
-      temperature: '41.1°C',
-      rssi: '-71 dBm',
-      lastPing: 'Live (Just now)',
-    },
-  ]);
+  const [bins, setBins] = useState<any[]>([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'bins'), (snap) => {
+      const binData = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setBins(binData);
+    });
+    return unsub;
+  }, []);
 
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 

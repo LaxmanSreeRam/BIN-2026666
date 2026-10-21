@@ -717,7 +717,7 @@ const [isStaticFallback, setIsStaticFallback] =
 
                     <button
                       type="button"
-                      onClick={handleVerifyCode}
+                      onClick={isPhoneMode ? handleVerifySmsCode : handleVerifyCode}
                       disabled={isLoading || verificationCode.trim().length < 6}
                       className="flex-1 btn-stai-cyan justify-center py-2.5 text-xs font-bold uppercase tracking-wider"
                     >

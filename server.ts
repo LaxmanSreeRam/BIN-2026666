@@ -669,6 +669,39 @@ async function startServer() {
     });
   });
 
+  // Raspberry Pi Smart Bin Update Fill Level Endpoint
+  app.post(['/api/smart-bin/update-fill-level', '/smart-bin/update-fill-level'], async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+
+    const { binId, fillLevel } = req.body;
+
+    if (!binId || fillLevel === undefined) {
+      return res.status(400).json({ success: false, error: "binId and fillLevel are required." });
+    }
+
+    try {
+      // Update in Firestore 'bins' collection
+      const binRef = doc(db, 'bins', binId);
+      await setDoc(binRef, {
+        binId,
+        fillLevel: Number(fillLevel),
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      console.log(`[SMART BIN] Fill level updated: ${binId} -> ${fillLevel}%`);
+      return res.json({ success: true, message: 'Fill level updated.' });
+    } catch (e: any) {
+      console.error('[SMART BIN] Error updating fill level:', e);
+      return res.status(500).json({ success: false, error: 'Failed to update fill level.' });
+    }
+  });
+
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
