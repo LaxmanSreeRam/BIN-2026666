@@ -19,6 +19,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+      // Set CORS headers for Raspberry Pi / Python requests
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+  }
+
+
     // Initialize Firebase safely for serverless environment
     const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, firebaseConfig.firestoreDatabaseId);
