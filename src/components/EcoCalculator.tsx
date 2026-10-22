@@ -166,21 +166,13 @@ else:
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-5">
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                <div className="text-xs text-slate-400 font-medium">Monthly CO₂ Saved</div>
-                <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">
-                  {monthlyCo2Saved.toFixed(0)} <span className="text-xs font-normal text-slate-400">kg</span>
-                </div>
-              </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
+              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 col-span-2">
                 <div className="text-xs text-slate-400 font-medium">Monthly Waste Diverted</div>
                 <div className="text-2xl font-black text-teal-400 mt-1 font-mono">
                   {monthlyWasteDiverted.toFixed(0)} <span className="text-xs font-normal text-slate-400">kg</span>
                 </div>
               </div>
-            </div>
           </div>
 
           <div className="pt-4 border-t border-slate-800">

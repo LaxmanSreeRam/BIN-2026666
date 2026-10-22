@@ -299,12 +299,7 @@ export const PersonalDashboard: React.FC<PersonalDashboardProps> = ({
 
           {/* Right: stats */}
           <div className="rounded-2xl bg-black/35 border border-white/10 p-4 sm:p-5 backdrop-blur-md">
-            <div className="grid grid-cols-2 gap-3 text-center mb-4">
-              <div className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
-                <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-400">Total Points</span>
-                <span className="font-display text-3xl font-extrabold text-emerald-300 leading-none">{currentStudent.points}</span>
-                <span className="text-xs text-slate-500 ml-1 font-mono">pts</span>
-              </div>
+            <div className="grid grid-cols-1 gap-3 text-center mb-4">
               <div className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
                 <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-400">Rank</span>
                 <span className="font-display text-3xl font-extrabold text-cyan-300 leading-none">#{currentStudent.rank}</span>

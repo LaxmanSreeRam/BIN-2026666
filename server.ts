@@ -703,7 +703,7 @@ async function startServer() {
   });
 
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    return res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
   app.get('/api/logo-status', (req, res) => {
