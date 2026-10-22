@@ -1,12 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { initializeApp, getApps } from 'firebase/app';
 import { initializeFirestore, doc, setDoc } from 'firebase/firestore';
-import firebaseConfig from '../firebase-applet-config.json';
-
+import firebaseConfig from './hi.json';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  try {
-      // Set CORS headers for Raspberry Pi / Python requests
+  // 1. Always set CORS headers first so the Pi can read any response (even errors)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -19,11 +17,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
   }
 
-
-    // Initialize Firebase safely for serverless environment
+  // 2. Wrap EVERYTHING in try/catch so runtime crashes return clean JSON to the Pi
+  try {
+    // Initialize Firebase safely inside the guarded block
     const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-    const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, firebaseConfig.firestoreDatabaseId);
+    const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 
+    // Parse incoming payload safely
     const { redeemCode, code, pointsGiven, points, binId } = req.body || {};
     const rawCode = redeemCode || code;
     const rawPoints = pointsGiven || points;
@@ -32,6 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({
         success: false,
         error: 'Missing required field: redeemCode',
+        receivedBody: req.body
       });
     }
 
@@ -52,11 +53,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };
 
-    // Save directly to Firestore
+    // Attempt to write to Firestore
     const cardRef = doc(db, 'giftCards', docId);
     await setDoc(cardRef, cardData, { merge: true });
 
-    console.log(`[VERCEL API] Gift card ${cleanCode} (${pts} pts) saved to Firestore.`);
+    console.log(`[VERCEL API SUCCESS] Gift card ${cleanCode} (${pts} pts) written to Firestore.`);
 
     return res.status(201).json({
       success: true,
@@ -64,35 +65,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       giftCard: {
         redeemCode: cleanCode,
         pointsGiven: pts,
-        status: 'active',
+        status: 'active'
       },
     });
+
   } catch (err: any) {
-    console.error('[VERCEL API ERROR]', err);
+    // If anything fails (Firebase config error, Firestore permission block, etc.),
+    // it will be caught here and sent back to your Pi as JSON!
+    console.error('[VERCEL API CRASH ERROR]:', err);
     return res.status(500).json({
       success: false,
-      error: 'Function execution failed',
-      details: err?.message || String(err)
+      error: 'Serverless execution failed',
+      details: err?.message || String(err),
+      stack: err?.stack || undefined
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
