@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  /*res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
-  }*/
+  }
 
   try {
     const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
