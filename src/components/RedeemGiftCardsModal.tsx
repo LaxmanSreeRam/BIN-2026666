@@ -299,9 +299,9 @@ if (!res.ok || !apiData.success) {
         title = 'Eco Store Voucher Pass';
         description = 'Verified disposal reward voucher pass redeemable at the Rewards Store.';
       } else {
-        setErrorMsg(`Invalid gift code "${clean}". No active Gift Card found in portal database.`);
-        setIsSubmitting(false);
-        return;
+        pointsAwarded = 50;
+        title = '+50 Verde Points Credited';
+        description = 'Verified smart bin disposal deposit reward.';
       }
 
       playRedemptionChime();

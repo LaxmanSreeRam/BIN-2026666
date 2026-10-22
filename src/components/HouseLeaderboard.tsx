@@ -106,17 +106,7 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
           </div>
 
           {/* Real-time Telemetry Metrics Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 pt-8 border-t border-white/10">
-            
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-              <div className="text-[11px] font-mono text-cyan-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                <span>Total Verde Points</span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-tight tabular-nums">
-                {totalPoints.toLocaleString()} <span className="text-xs text-cyan-400">pts</span>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-4 mt-10 pt-8 border-t border-white/10 max-w-xl">
 
             <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
               <div className="text-[11px] font-mono text-violet-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
@@ -125,16 +115,6 @@ export const CampusDashboard: React.FC<CampusDashboardProps> = ({
               </div>
               <div className="text-2xl sm:text-3xl font-extrabold font-mono text-white tracking-tight tabular-nums">
                 {onlyStudents.length} <span className="text-xs text-slate-400">members</span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-              <div className="text-[11px] font-mono text-emerald-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>CO₂ Neutralized</span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold font-mono text-emerald-300 tracking-tight tabular-nums">
-                {totalCo2.toFixed(1)} <span className="text-xs text-slate-400">kg</span>
               </div>
             </div>
 
