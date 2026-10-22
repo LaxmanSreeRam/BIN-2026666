@@ -5,10 +5,6 @@ import firebaseConfig from '../firebase-applet-config.json';
 
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Initialize Firebase safely for serverless environment
-  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-  const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, firebaseConfig.firestoreDatabaseId);
-
   // Set CORS headers for Raspberry Pi / Python requests
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -23,6 +19,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Initialize Firebase safely for serverless environment
+    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+    const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, firebaseConfig.firestoreDatabaseId);
+
     const { redeemCode, code, pointsGiven, points, binId } = req.body || {};
     const rawCode = redeemCode || code;
     const rawPoints = pointsGiven || points;
