@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { initializeApp, getApps } from 'firebase/app';
 import { initializeFirestore, doc, setDoc } from 'firebase/firestore';
-import firebaseConfig from '../src/firebase-applet-config.json';
+import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase safely for serverless environment
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
