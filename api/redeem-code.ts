@@ -68,3 +68,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (err: any) {
     console.error('[VERCEL API ERROR]', err);
+    return res.status(500).json({
+      success: false,
+      error: 'Function execution failed',
+      details: err?.message || String(err)
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
